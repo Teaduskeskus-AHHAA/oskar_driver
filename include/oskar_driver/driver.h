@@ -22,7 +22,7 @@ private:
   ros::Timer timer_;
   ros::NodeHandle nh_;
 
-  BoardComms* bc;
+  BoardComms* bc_;
 };
 
 }  // namespace ahhaa_oskar

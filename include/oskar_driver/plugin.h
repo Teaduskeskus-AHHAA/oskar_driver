@@ -18,9 +18,9 @@ public:
   std::string getName();
 
 private:
-  json data;
-  std::string name;
-  BoardComms* comms;
+  json data_;
+  std::string name_;
+  BoardComms* comms_;
   ros::NodeHandle nh_;
 };
 typedef std::shared_ptr<Plugin> PluginPtr;

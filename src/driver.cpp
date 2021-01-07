@@ -10,8 +10,8 @@ Driver::Driver()
 
   timer_ = nh_.createTimer(ros::Duration(0.01), &Driver::update, this);
 
-  this->bc = new BoardComms("/dev/ttyUSB0", 9600);
-  this->plugins_.emplace_back(std::make_shared<MotorPlugin>(this->bc, "MotorPlugin"));
+  this->bc_ = new BoardComms("/dev/ttyUSB0", 9600);
+  this->plugins_.emplace_back(std::make_shared<MotorPlugin>(this->bc_, "MotorPlugin"));
 }
 
 Driver::~Driver()
