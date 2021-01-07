@@ -1,14 +1,21 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(oskar_driver)
+add_compile_options(-std=c++11)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
   serial
+  geometry_msgs
 )
 
-catkin_package()
+catkin_package(
+  CATKIN_DEPENDS
+    std_msgs
+    geometry_msgs
+    serial
+)
 
 include_directories(
   include

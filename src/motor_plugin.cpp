@@ -4,7 +4,7 @@ namespace ahhaa_oskar
 {
 MotorPlugin::MotorPlugin(BoardComms* comms, std::string name) : Plugin(comms, name)
 {
-  cmd_vel_sub_ = nh_.subscribe("/cmd_vel", 1, &MotorPlugin::cmd_vel_callback, this);
+  cmd_vel_sub_ = nh_.subscribe("cmd_vel", 1, &MotorPlugin::cmd_vel_callback, this);
 }
 
 MotorPlugin::~MotorPlugin()
