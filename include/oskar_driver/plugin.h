@@ -18,10 +18,12 @@ public:
   std::string getName();
 
 private:
-  json data_;
   std::string name_;
   BoardComms* comms_;
   ros::NodeHandle nh_;
+
+protected:
+  json data_;
 };
 typedef std::shared_ptr<Plugin> PluginPtr;
 }  // namespace ahhaa_oskar
