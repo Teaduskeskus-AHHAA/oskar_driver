@@ -49,4 +49,13 @@ void BoardComms::reconnect(const ros::TimerEvent &event)
     tryConnect();
   }
 }
+
+void BoardComms::writeObject(json object)
+{
+  if (object.empty())
+  {
+    return;
+  }
+  serial_.write(object.dump());
+}
 }  // namespace ahhaa_oskar

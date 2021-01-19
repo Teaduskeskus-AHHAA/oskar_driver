@@ -3,6 +3,9 @@
 #include <ros/ros.h>
 #include <serial/serial.h>
 #include <string.h>
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
 
 namespace ahhaa_oskar
 {
@@ -11,6 +14,7 @@ class BoardComms
 public:
   BoardComms(std::string portName, int baudrate);
   ~BoardComms();
+  void writeObject(json object);
 
 private:
   void tryConnect();

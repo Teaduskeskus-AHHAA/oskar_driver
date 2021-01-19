@@ -19,10 +19,10 @@ public:
 
 private:
   std::string name_;
-  BoardComms* comms_;
   ros::NodeHandle nh_;
 
 protected:
+  BoardComms* comms_;
   json data_;
 };
 typedef std::shared_ptr<Plugin> PluginPtr;
