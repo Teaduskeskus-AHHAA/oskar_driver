@@ -50,12 +50,16 @@ void BoardComms::reconnect(const ros::TimerEvent &event)
   }
 }
 
-void BoardComms::writeObject(json object)
+void BoardComms::send(OskarPacket packet)
 {
-  if (object.empty())
+  if (packet.getEncapsulatedFrame().size() == 0)
   {
     return;
   }
-  serial_.write(object.dump());
+  else
+  {
+    serial_.write(packet.getEncapsulatedFrame());
+  }
 }
+
 }  // namespace ahhaa_oskar

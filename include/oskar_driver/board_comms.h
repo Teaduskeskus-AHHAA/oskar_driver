@@ -1,11 +1,9 @@
 #ifndef BOARDCOMMS_H
 #define BOARDCOMMS_H
+#include <oskar_driver/oskar_packet.h>
 #include <ros/ros.h>
 #include <serial/serial.h>
 #include <string.h>
-#include <nlohmann/json.hpp>
-
-using json = nlohmann::json;
 
 namespace ahhaa_oskar
 {
@@ -14,7 +12,7 @@ class BoardComms
 public:
   BoardComms(std::string portName, int baudrate);
   ~BoardComms();
-  void writeObject(json object);
+  void send(OskarPacket packet);
 
 private:
   void tryConnect();

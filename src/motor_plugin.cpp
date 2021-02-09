@@ -6,7 +6,7 @@ MotorPlugin::MotorPlugin(BoardComms* comms, std::string name) : Plugin(comms, na
 {
   cmd_vel_sub_ = nh_.subscribe("cmd_vel", 1, &MotorPlugin::cmd_vel_callback, this);
   this->base_width_ = 0.600;
-  this->data_["type"] = "COMMAND";
+  this->packet.setCommand(0x01);
 }
 
 MotorPlugin::~MotorPlugin()
@@ -25,13 +25,23 @@ int32_t MotorPlugin::calc_speed(const geometry_msgs::Twist& cmd_vel_msg, bool le
 
 void MotorPlugin::cmd_vel_callback(const geometry_msgs::Twist& cmd_vel_msg)
 {
-  this->data_["data"][0]["target"] = "WHEEL_LEFT";
-  this->data_["data"][0]["value"] = this->calc_speed(cmd_vel_msg, true);
-  this->data_["data"][1]["target"] = "WHEEL_RIGHT";
-  this->data_["data"][1]["value"] = this->calc_speed(cmd_vel_msg);
+  int32_t left_speed = this->calc_speed(cmd_vel_msg, true);
+  int32_t right_speed = this->calc_speed(cmd_vel_msg);
 
-  ROS_INFO_STREAM("Writing out " << this->data_.dump());
-  this->comms_->writeObject(this->data_);
+  this->data.push_back(0x4c);
+  this->data.push_back(left_speed & 0xFF);
+  this->data.push_back((left_speed >> 8) & 0xFF);
+  this->data.push_back((left_speed >> 16) & 0xFF);
+  this->data.push_back((left_speed >> 24) & 0xFF);
+  this->data.push_back(0x52);
+  this->data.push_back(right_speed & 0xFF);
+  this->data.push_back((right_speed >> 8) & 0xFF);
+  this->data.push_back((right_speed >> 16) & 0xFF);
+  this->data.push_back((right_speed >> 24) & 0xFF);
+
+  this->packet.setData(this->data);
+  this->packet.encapsulate();
+  this->comms_->send(this->packet);
 }
 
 }  // namespace ahhaa_oskar
