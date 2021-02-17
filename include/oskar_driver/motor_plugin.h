@@ -5,6 +5,8 @@
 #include <ros/ros.h>
 #include <vector>
 
+#define LEFT_MOTOR 0x4c
+#define RIGHT_MOTOR 0x52
 namespace ahhaa_oskar
 {
 class MotorPlugin : public Plugin
