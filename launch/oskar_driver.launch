@@ -1,4 +1,6 @@
 <?xml version="1.0" ?>
 <launch>
-    <node ns="oskar_driver" pkg="oskar_driver" name="$(anon ahhaa_oskar_driver_node)" type="ahhaa_oskar_driver_node" output="screen" />
+  <node pkg="joy" name="joy" type="joy_node" output="screen"/>
+  <node pkg="teleop_twist_joy" name="teleop_node" type="teleop_node" output="screen" />
+  <node pkg="oskar_driver" name="oskar_driver_node" type="ahhaa_oskar_driver_node" output="screen" />
 </launch>
