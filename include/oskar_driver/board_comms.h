@@ -10,7 +10,7 @@ namespace ahhaa_oskar
 class BoardComms
 {
 public:
-  BoardComms(std::string portName, int baudrate);
+  BoardComms(std::string port_name, int baudrate);
   ~BoardComms();
   void send(OskarPacket packet);
 

@@ -2,9 +2,9 @@
 
 namespace ahhaa_oskar
 {
-BoardComms::BoardComms(std::string portName, int baudrate)
+BoardComms::BoardComms(std::string port_name, int baudrate)
 {
-  this->serial_.setPort(portName);
+  this->serial_.setPort(port_name);
   this->serial_.setBaudrate(baudrate);
   serial::Timeout timeout = serial::Timeout::simpleTimeout(1000);
   serial_.setTimeout(timeout);
