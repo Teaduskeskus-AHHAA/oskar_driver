@@ -1,4 +1,5 @@
 #include <oskar_driver/board_comms.h>
+
 namespace ahhaa_oskar
 {
 BoardComms::BoardComms(std::string portName, int baudrate)
@@ -51,17 +52,24 @@ void BoardComms::reconnect(const ros::TimerEvent &event)
 
 void BoardComms::send(OskarPacket packet)
 {
-ROS_INFO_STREAM(packet.getEncapsulatedFrame().size());
+  ROS_INFO_STREAM(packet.getEncapsulatedFrame().size());
   if (packet.getEncapsulatedFrame().size() == 0)
   {
     return;
   }
   else
   {
-    try {    
+    try
+    {
       serial_.write(packet.getEncapsulatedFrame());
-    } catch(serial::SerialException e) {
-      ROS_ERROR_STREAM_THROTTLE(1,e.what());
+    }
+    catch (serial::SerialException e)
+    {
+      if (serial_.isOpen())
+      {
+        serial_.close();
+      }
+      ROS_ERROR_STREAM_THROTTLE(1, e.what());
     }
   }
 }
