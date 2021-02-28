@@ -20,6 +20,7 @@ private:
   serial::Serial serial_;
   ros::NodeHandle nh_;
   ros::Timer timer_;
+  bool reconnect_requested_;
 };
 
 }  // namespace ahhaa_oskar
