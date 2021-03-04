@@ -25,6 +25,8 @@ public:
   void encapsulate();
   void setCommand(uint8_t command);
   void setData(std::vector<uint8_t> data);
+  uint8_t getCommand();
+  std::vector<uint8_t> getEscapedData();
   std::vector<uint8_t> getEncapsulatedFrame();
 
 private:

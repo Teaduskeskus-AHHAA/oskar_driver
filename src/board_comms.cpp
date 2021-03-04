@@ -55,24 +55,20 @@ void BoardComms::reconnect(const ros::TimerEvent &event)
 
 void BoardComms::send(OskarPacket packet)
 {
-  if (!this->reconnect_requested_)
+  if (packet.getEncapsulatedFrame().size() == 0)
   {
-    ROS_INFO_STREAM(packet.getEncapsulatedFrame().size());
-    if (packet.getEncapsulatedFrame().size() == 0)
+    return;
+  }
+  else
+  {
+    try
     {
-      return;
+      serial_.write(packet.getEncapsulatedFrame());
     }
-    else
+    catch (serial::SerialException e)
     {
-      try
-      {
-        serial_.write(packet.getEncapsulatedFrame());
-      }
-      catch (serial::SerialException e)
-      {
-        reconnect_requested_ = true;
-        ROS_ERROR_STREAM_THROTTLE(1, e.what());
-      }
+      reconnect_requested_ = true;
+      ROS_ERROR_STREAM_THROTTLE(1, e.what());
     }
   }
 }

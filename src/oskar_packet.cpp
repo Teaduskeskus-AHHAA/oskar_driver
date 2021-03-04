@@ -1,4 +1,5 @@
 #include <oskar_driver/oskar_packet.h>
+#include <ros/ros.h>
 
 namespace ahhaa_oskar
 {
@@ -20,29 +21,45 @@ void OskarPacket::setData(std::vector<uint8_t> data)
   this->data = data;
 }
 
-void OskarPacket::encapsulate()
+uint8_t OskarPacket::getCommand()
 {
-  this->encapsulated_frame.clear();
-  this->encapsulated_frame.push_back(END);
-  this->encapsulated_frame.push_back(this->data.size() + 1);
-  this->encapsulated_frame.push_back(this->command);
+  return this->command;
+}
+
+std::vector<uint8_t> OskarPacket::getEscapedData()
+{
+  std::vector<uint8_t> result;
+  result.clear();
+
   for (uint8_t i = 0; i < this->data.size(); i++)
   {
     if (this->data[i] == END)
     {
-      this->encapsulated_frame.push_back(ESC);
-      this->encapsulated_frame.push_back(ESC_END);
+      result.push_back(ESC);
+      result.push_back(ESC_END);
     }
     else if (this->data[i] == 0xDB)
     {
-      this->encapsulated_frame.push_back(ESC);
-      this->encapsulated_frame.push_back(ESC_ESC);
+      result.push_back(ESC);
+      result.push_back(ESC_ESC);
     }
     else
     {
-      this->encapsulated_frame.push_back(this->data[i]);
+      result.push_back(this->data[i]);
     }
   }
+
+  return result;
+}
+
+void OskarPacket::encapsulate()
+{
+  std::vector<uint8_t> esc_data = this->getEscapedData();
+  this->encapsulated_frame.clear();
+  this->encapsulated_frame.push_back(END);
+  this->encapsulated_frame.push_back(esc_data.size() + 1);
+  this->encapsulated_frame.push_back(this->command);
+  this->encapsulated_frame.insert(this->encapsulated_frame.end(), esc_data.begin(), esc_data.end());
   this->encapsulated_frame.push_back(END);
 }
 
