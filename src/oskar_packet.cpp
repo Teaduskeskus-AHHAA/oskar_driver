@@ -26,6 +26,14 @@ uint8_t OskarPacket::getCommand()
   return this->command;
 }
 
+uint16_t OskarPacket::calcCRC(uint16_t crc, uint8_t data)
+{
+  data ^= (crc)&0xff;
+  data ^= data << 4;
+
+  return ((((uint16_t)data << 8) | (crc) >> 8) ^ (uint8_t)(data >> 4) ^ ((uint16_t)data << 3));
+}
+
 std::vector<uint8_t> OskarPacket::getEscapedData()
 {
   std::vector<uint8_t> result;
@@ -60,6 +68,14 @@ void OskarPacket::encapsulate()
   this->encapsulated_frame.push_back(esc_data.size() + 1);
   this->encapsulated_frame.push_back(this->command);
   this->encapsulated_frame.insert(this->encapsulated_frame.end(), esc_data.begin(), esc_data.end());
+
+  uint8_t crc = 0, i;
+  for (i = 0; i < esc_data.size() / sizeof(esc_data[0]); i++)
+  {
+    crc = calcCRC(crc, esc_data[i]);
+  }
+  this->encapsulated_frame.push_back(crc);
+
   this->encapsulated_frame.push_back(END);
 }
 
