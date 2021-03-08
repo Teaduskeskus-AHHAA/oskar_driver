@@ -87,8 +87,8 @@ std::vector<uint8_t> OskarPacket::getEncapsulatedFrame()
   return this->encapsulated_frame;
 }
 
-void reconstruct(std::vector<uint8_t> data) {
-  
+void OskarPacket::reconstruct(std::vector<uint8_t> data) {
+  ROS_INFO_STREAM("recons");
 }
 
 }  // namespace ahhaa_oskar
