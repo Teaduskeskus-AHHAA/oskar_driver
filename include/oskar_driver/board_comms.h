@@ -13,6 +13,8 @@ public:
   BoardComms(std::string port_name, int baudrate);
   ~BoardComms();
   void send(OskarPacket packet);
+  bool readPacket(OskarPacket packet, std::string temp_DBG);
+  std::vector<uint8_t> data_read_buffer;
 
 private:
   void tryConnect();
@@ -21,6 +23,7 @@ private:
   ros::NodeHandle nh_;
   ros::Timer timer_;
   bool reconnect_requested_;
+
 };
 
 }  // namespace ahhaa_oskar

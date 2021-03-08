@@ -21,6 +21,11 @@ Driver::~Driver()
 
 void Driver::update(const ros::TimerEvent &event)
 {
-  // ROS_INFO("Oskar III Update");
+  OskarPacket packet;
+  std::string dbg;
+  if(this->bc_->readPacket(packet,dbg)) {
+    ROS_INFO_STREAM("GOT PACKET");
+  }
+ //ROS_INFO("Oskar III Update");
 }
 }  // namespace ahhaa_oskar
