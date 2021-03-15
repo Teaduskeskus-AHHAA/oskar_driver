@@ -91,7 +91,8 @@ bool BoardComms::readPacket(OskarPacket packet, std::string temp_DBG)
       std::vector<uint8_t> data_read;
       serial_.read(data_read, bytes_available);
       data_read_buffer.insert(this->data_read_buffer.end(), data_read.begin(), data_read.end());
-      //TODO: Implement a timeout for flushing data_read_buffer when it does not form a packet in X amount of time, or implement method to slice out valid packages from it. 
+      // TODO: Implement a timeout for flushing data_read_buffer when it does not form a packet in X amount of time, or
+      // implement method to slice out valid packages from it.
     }
   }
   catch (serial::IOException e)
@@ -107,15 +108,17 @@ bool BoardComms::readPacket(OskarPacket packet, std::string temp_DBG)
     reconnect_requested_ = true;
   }
 
-  if(data_read_buffer.size() > 1) {
- // ROS_INFO("START: 0x%x  END 0x%x", data_read_buffer[0], data_read_buffer[data_read_buffer.size()-1]);
-
+  if (data_read_buffer.size() > 1)
+  {
+    // ROS_INFO("START: 0x%x  END 0x%x", data_read_buffer[0], data_read_buffer[data_read_buffer.size()-1]);
   }
-  if((data_read_buffer.size() > 1) && (data_read_buffer[0] == END) && (data_read_buffer[data_read_buffer.size() - 1] == END) ) {
+  if ((data_read_buffer.size() > 1) && (data_read_buffer[0] == END) &&
+      (data_read_buffer[data_read_buffer.size() - 1] == END))
+  {
     packet.reconstruct(data_read_buffer);
     data_read_buffer.clear();
     return true;
-  } 
+  }
 
   return false;
 }
