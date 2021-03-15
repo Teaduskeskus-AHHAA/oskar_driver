@@ -91,6 +91,7 @@ bool BoardComms::readPacket(OskarPacket packet, std::string temp_DBG)
       std::vector<uint8_t> data_read;
       serial_.read(data_read, bytes_available);
       data_read_buffer.insert(this->data_read_buffer.end(), data_read.begin(), data_read.end());
+      //TODO: Implement a timeout for flushing data_read_buffer when it does not form a packet in X amount of time, or implement method to slice out valid packages from it. 
     }
   }
   catch (serial::IOException e)
