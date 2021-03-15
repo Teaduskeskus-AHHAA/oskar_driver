@@ -76,8 +76,6 @@ void OskarPacket::encapsulate()
   }
   this->encapsulated_frame.push_back(crc & 0xFF);
   this->encapsulated_frame.push_back(crc >> 8);
-  ROS_INFO("crc %x", crc);
-
   this->encapsulated_frame.push_back(END);
 
 }
@@ -88,7 +86,16 @@ std::vector<uint8_t> OskarPacket::getEncapsulatedFrame()
 }
 
 void OskarPacket::reconstruct(std::vector<uint8_t> data) {
-  ROS_INFO_STREAM("recons");
+  if((data.at(0) == END) && (data.at(data.size() - 1) == END)) {
+    uint16_t crc_read = data.at(data.size() - 3) | (data.at(data.size() - 2) << 8);
+    uint16_t crc = 0, i;
+    for (i = 4; i < (data.size() / sizeof(data[0]))-3; i++)
+    {
+      crc = calcCRC(crc, data[i]);
+    }
+    if(crc == crc_read) {
+    }
+  }
 }
 
 }  // namespace ahhaa_oskar

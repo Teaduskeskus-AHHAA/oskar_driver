@@ -114,7 +114,7 @@ bool BoardComms::readPacket(OskarPacket packet, std::string temp_DBG)
     packet.reconstruct(data_read_buffer);
     data_read_buffer.clear();
     return true;
-  }
+  } 
 
   return false;
 }
