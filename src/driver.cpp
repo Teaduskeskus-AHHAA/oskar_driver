@@ -19,13 +19,18 @@ Driver::~Driver()
   ROS_INFO("Killing Oskar-III driver");
 }
 
-void Driver::update(const ros::TimerEvent &event)
+void Driver::update(const ros::TimerEvent& event)
 {
   OskarPacket packet;
   std::string dbg;
-  if(this->bc_->readPacket(packet,dbg)) {
-    ROS_INFO_STREAM("GOT PACKET");
+  if (this->bc_->readPacket(packet, dbg))
+  {
+    for (auto& plugin : plugins_)
+    {
+      plugin->processPacket(packet);
+      ROS_INFO_STREAM(plugin->getName());
+    }
   }
- //ROS_INFO("Oskar III Update");
+  // ROS_INFO("Oskar III Update");
 }
 }  // namespace ahhaa_oskar

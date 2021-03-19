@@ -1,0 +1,6 @@
+#ifndef OSKAR_COMMANDS_H
+#define OSKAR_COMMANDS_H
+
+#define DRIVESPEEDS_COMMAND 0x01
+
+#endif

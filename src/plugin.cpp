@@ -15,4 +15,9 @@ std::string Plugin::getName()
 {
   return this->name_;
 }
+
+void Plugin::processPacket(OskarPacket packet)
+{
+}
+
 }  // namespace ahhaa_oskar

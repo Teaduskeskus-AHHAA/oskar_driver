@@ -97,10 +97,7 @@ void OskarPacket::encapsulate()
   this->encapsulated_frame.push_back(esc_data.size() + 1);
   this->encapsulated_frame.push_back(this->command);
   this->encapsulated_frame.insert(this->encapsulated_frame.end(), esc_data.begin(), esc_data.end());
-  for (uint8_t i = 0; i < esc_data.size(); i++)
-  {
-    ROS_INFO("0x%x", esc_data.at(i));
-  }
+
   uint16_t crc = 0, i;
   for (i = 0; i < esc_data.size() / sizeof(esc_data[0]); i++)
   {
@@ -130,11 +127,9 @@ void OskarPacket::reconstruct(std::vector<uint8_t> data)
     {
       this->setCommand(data.at(2));
       std::vector<uint8_t> encapsulated_escaped_data;
-      encapsulated_escaped_data.insert(encapsulated_escaped_data.end(), &data.at(3), &data.at(3 + (data.at(1) - 1)));
-      for (uint8_t i = 0; i < encapsulated_escaped_data.size(); i++)
-      {
-        ROS_INFO("0x%x", encapsulated_escaped_data.at(i));
-      }
+      encapsulated_escaped_data.insert(encapsulated_escaped_data.end(), &data.at(4), &data.at(3 + (data.at(1))));
+
+      this->data = this->getUnescapedData(encapsulated_escaped_data);
     }
   }
 }

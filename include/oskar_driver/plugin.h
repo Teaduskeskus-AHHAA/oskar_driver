@@ -13,7 +13,9 @@ class Plugin
 {
 public:
   Plugin(BoardComms* comms, std::string name);
-  ~Plugin();
+  virtual ~Plugin();
+
+  virtual void processPacket(OskarPacket packet);
 
   std::string getName();
 

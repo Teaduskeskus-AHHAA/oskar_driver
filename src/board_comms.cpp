@@ -55,7 +55,6 @@ void BoardComms::reconnect(const ros::TimerEvent &event)
 
 void BoardComms::send(OskarPacket packet)
 {
-  ROS_INFO_STREAM("size of enc frame size: " << packet.getEncapsulatedFrame().size());
   if (packet.getEncapsulatedFrame().size() == 0)
   {
     return;
@@ -108,10 +107,6 @@ bool BoardComms::readPacket(OskarPacket packet, std::string temp_DBG)
     reconnect_requested_ = true;
   }
 
-  if (data_read_buffer.size() > 1)
-  {
-    // ROS_INFO("START: 0x%x  END 0x%x", data_read_buffer[0], data_read_buffer[data_read_buffer.size()-1]);
-  }
   if ((data_read_buffer.size() > 1) && (data_read_buffer[0] == END) &&
       (data_read_buffer[data_read_buffer.size() - 1] == END))
   {

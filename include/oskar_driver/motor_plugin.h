@@ -14,12 +14,12 @@ class MotorPlugin : public Plugin
 public:
   MotorPlugin(BoardComms* comms, std::string name);
   ~MotorPlugin();
+  void processPacket(OskarPacket packet) override;
 
 private:
   ros::NodeHandle nh_;
   ros::Subscriber cmd_vel_sub_;
   float base_width_;
-  OskarPacket packet;
   std::vector<uint8_t> data;
   int32_t calc_speed(const geometry_msgs::Twist& cmd_vel_msg, bool left);
   void cmd_vel_callback(const geometry_msgs::Twist& cmd_vel_msg);
