@@ -28,7 +28,6 @@ void Driver::update(const ros::TimerEvent& event)
     for (auto& plugin : plugins_)
     {
       plugin->processPacket(packet);
-      ROS_INFO_STREAM(plugin->getName());
     }
   }
   // ROS_INFO("Oskar III Update");
