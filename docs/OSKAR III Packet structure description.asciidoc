@@ -1,0 +1,128 @@
+= OSKAR III Packet structure description
+Rando Hinn <rando.hinn@ahhaa.ee>
+v0.1, March 2021
+:doctype: manpage
+
+:sectnums:
+
+
+
+This document serves as the packet structure documentation for Oskar III. The documentation presented here describes the packets as they are structured before the escaping and encapsulation process that takes place at the moment of transmission.
+
+Each packet implemented shares the same generic structure before escaping and encapsulation.
+
+[bytefield, svg]
+----
+  (defattrs :bg-green {:fill "#a0ffa0"})
+  (defattrs :bg-yellow {:fill "#ffffa0"})
+  (def box-width 60)
+  (def boxes-per-row 4)
+  (draw-box "CMD" :bg-green)
+  (draw-box "DATA" :bg-yellow)
+  (draw-gap-inline)
+  (draw-box "DATA" :bg-yellow)
+----
+
+where 
+
+|=== 
+
+| **CMD** | The command opcode  
+
+| **DATA** | The data to go along with the command
+
+|=== 
+
+
+The generic structure applied to packets during transmission (after escaping and encapsulation) is
+
+[bytefield, svg]
+----
+  (defattrs :bg-green {:fill "#a0ffa0"})
+  (defattrs :bg-yellow {:fill "#ffffa0"})
+  (defattrs :bg-pink {:fill "#ffb0a0"})
+  (defattrs :bg-cyan {:fill "#a0fafa"})
+  (defattrs :bg-purple {:fill "#e4b5f7"})
+  (def box-width 60)
+  (def row-height 50)
+  (draw-box "END" :bg-purple)
+  (draw-box "LEN" :bg-cyan)
+  (draw-box "CMD" :bg-green)
+  (draw-box "DATA" :bg-yellow)
+  (draw-gap-inline)
+  (draw-box "DATA" :bg-yellow)
+  (draw-box "CRCL" :bg-pink)
+  (draw-box "CRCH" :bg-pink)
+  (draw-box "END" :bg-purple)
+----
+
+where 
+
+|=== 
+
+| **END ** | 0xC0
+
+| ** LEN **| Lenght of the escaped data + 1 (for the command)
+
+| **CMD** | The command opcode  
+
+| **DATA** | The data to go along with the command, escaped using SLIP protocol values
+
+| ** CRCL & CRCH ** | The low and high bytes of the CRC16 calculated over the escaped data
+
+|=== 
+
+<<<
+
+= {doctitle}
+{author} - {email} - Version {revnumber}, {revdate}
+
+---
+
+== Commands from Host to OSKAR
+
+=== Drivespeed command
+
+[bytefield, svg]
+----
+  (defattrs :bg-green {:fill "#a0ffa0"})
+  (defattrs :bg-yellow {:fill "#ffffa0"})
+  (defattrs :bg-pink {:fill "#ffb0a0"})
+  (defattrs :bg-cyan {:fill "#a0fafa"})
+  (defattrs :bg-purple {:fill "#e4b5f7"})
+
+  (def boxes-per-row 11)
+  (draw-column-headers)
+
+  (draw-box 0x01 :bg-green)
+  (draw-box 0x4c :bg-yellow)
+  (draw-box "??" :bg-yellow)
+  (draw-box "??" :bg-yellow)
+  (draw-box "??" :bg-yellow)
+  (draw-box "??" :bg-yellow)
+  (draw-box 0x52 :bg-yellow)
+  (draw-box "??" :bg-yellow)
+  (draw-box "??" :bg-yellow)
+  (draw-box "??" :bg-yellow)
+  (draw-box "??" :bg-yellow)
+
+----
+
+where 
+
+|=== 
+
+| **0x01** | Opcode 0x01 
+| ** 0x4c **| ASCII for the letter L - signifies start of left motor speed
+| **??** | `left_speed & 0xFF` 
+| **??** | `(left_speed >> 8) & 0xFF`
+| **??** | `(left_speed >> 16) & 0xFF`
+| **??** | `(left_speed >> 24) & 0xFF`
+| ** 0x52 **| ASCII for the letter R - signifies start of right motor speed
+| **??** | `right_speed & 0xFF` 
+| **??** | `(right_speed >> 8) & 0xFF`
+| **??** | `(right_speed >> 16) & 0xFF`
+| **??** | `(right_speed >> 24) & 0xFF`
+|=== 
+
+`left_speed` and `right_speed` are of type `int32_t` in correspondance to the GYEMS motor protocol for speed control.
