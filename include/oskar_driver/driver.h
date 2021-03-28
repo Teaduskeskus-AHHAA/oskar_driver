@@ -2,6 +2,8 @@
 #define DRIVER_H
 #include <oskar_driver/board_comms.h>
 #include <oskar_driver/motor_plugin.h>
+#include <oskar_driver/odom_plugin.h>
+
 #include <oskar_driver/plugin.h>
 #include <ros/ros.h>
 #include <vector>

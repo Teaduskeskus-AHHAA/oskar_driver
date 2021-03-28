@@ -1,6 +1,7 @@
 #include <oskar_driver/board_comms.h>
 #include <oskar_driver/driver.h>
 #include <oskar_driver/motor_plugin.h>
+#include <oskar_driver/odom_plugin.h>
 
 namespace ahhaa_oskar
 {
@@ -12,6 +13,7 @@ Driver::Driver()
 
   this->bc_ = new BoardComms("/dev/ttyUSB0", 9600);
   this->plugins_.emplace_back(std::make_shared<MotorPlugin>(this->bc_, "MotorPlugin"));
+  this->plugins_.emplace_back(std::make_shared<OdomPlugin>(this->bc_, "OdomPlugin"));
 }
 
 Driver::~Driver()

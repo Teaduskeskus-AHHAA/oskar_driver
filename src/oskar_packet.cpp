@@ -115,17 +115,24 @@ std::vector<uint8_t> OskarPacket::getEncapsulatedFrame()
 
 void OskarPacket::reconstruct(std::vector<uint8_t> data)
 {
+  for (int i = 0; i < data.size(); i++)
+  {
+    ROS_INFO("%x", data[i]);
+  }
   if ((data.at(0) == END) && (data.at(data.size() - 1) == END))
   {
     uint16_t crc_read = data.at(data.size() - 3) | (data.at(data.size() - 2) << 8);
     uint16_t crc = 0, i;
-    for (i = 4; i < (data.size() / sizeof(data[0])) - 3; i++)
+    for (i = 4; i < data.size() - 3; i++)
     {
       crc = calcCRC(crc, data[i]);
     }
+    ROS_INFO_STREAM("I got crc as " << crc);
     if (crc == crc_read)
     {
-      this->setCommand(data.at(2));
+      ROS_INFO_STREAM("here");
+
+      this->setCommand(data[2]);
       std::vector<uint8_t> encapsulated_escaped_data;
       encapsulated_escaped_data.insert(encapsulated_escaped_data.end(), &data.at(4), &data.at(3 + (data.at(1))));
 

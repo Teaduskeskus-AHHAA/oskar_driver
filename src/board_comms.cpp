@@ -48,6 +48,7 @@ void BoardComms::reconnect(const ros::TimerEvent &event)
   if (!serial_.isOpen() || this->reconnect_requested_)
   {
     this->reconnect_requested_ = true;
+    this->data_read_buffer.clear();
     ROS_INFO("Serial port attempting reconnection");
     tryConnect();
   }
@@ -82,13 +83,19 @@ void BoardComms::send(OskarPacket packet)
 
 bool BoardComms::readPacket(OskarPacket packet, std::string temp_DBG)
 {
+  std::vector<uint8_t> data_read;
+
   try
   {
     size_t bytes_available = serial_.available();
     if (bytes_available)
     {
-      std::vector<uint8_t> data_read;
       serial_.read(data_read, bytes_available);
+      for (int i = 0; i < data_read.size(); i++)
+      {
+        ROS_INFO("%x ", data_read[i]);
+      }
+      ROS_INFO("-------------------------");
       data_read_buffer.insert(this->data_read_buffer.end(), data_read.begin(), data_read.end());
       // TODO: Implement a timeout for flushing data_read_buffer when it does not form a packet in X amount of time, or
       // implement method to slice out valid packages from it.
@@ -106,9 +113,9 @@ bool BoardComms::readPacket(OskarPacket packet, std::string temp_DBG)
   {
     reconnect_requested_ = true;
   }
+  ROS_INFO_STREAM("RBSIZE: " << data_read_buffer.size());
 
-  if ((data_read_buffer.size() > 1) && (data_read_buffer[0] == END) &&
-      (data_read_buffer[data_read_buffer.size() - 1] == END))
+  if ((data_read_buffer.size() > 1) && (data_read_buffer[0] == END) && (data_read[data_read.size() - 1] == END))
   {
     packet.reconstruct(data_read_buffer);
     data_read_buffer.clear();

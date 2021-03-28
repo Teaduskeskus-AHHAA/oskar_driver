@@ -22,7 +22,7 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-file(GLOB_RECURSE SOURCES  "src/*.cpp")
+file(GLOB_RECURSE SOURCES  "src/**.cpp")
 add_executable(ahhaa_oskar_driver_node
   ${SOURCES}
 ) 
