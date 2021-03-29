@@ -88,27 +88,34 @@ std::vector<OskarPacket> BoardComms::readPackets(OskarPacket packet, std::string
   {
     uint8_t byte_in[1];
 
-    size_t bytes_available = serial_.available();
-    if (bytes_available)
+    // size_t bytes_available = serial_.available();
+
+    while (serial_.available())
     {
-      for (int i = 0; i < bytes_available; i++)
+      serial_.read(byte_in, 1);
+      if ((last_byte_in_ == END) && (*byte_in == END) & (data_read.at(0) == END))
       {
-        serial_.read(byte_in, 1);
-
-        if ((last_byte_in_ == END) && (*byte_in == END) & (data_read.at(0) == END))
-        {
-          awaiting_data.push_back(data_read);
-          data_read.clear();
-        }
-        else if ((last_byte_in_ == END) && (*byte_in == END) & (data_read.at(0) != END))
-        {
-          data_read.clear();
-        }
-
-        data_read.push_back(*byte_in);
-        last_byte_in_ = *byte_in;
+        awaiting_data.push_back(data_read);
+        data_read.clear();
       }
+      else if ((last_byte_in_ == END) && (*byte_in == END) & (data_read.at(0) != END))
+      {
+        data_read.clear();
+      }
+
+      data_read.push_back(*byte_in);
+      last_byte_in_ = *byte_in;
     }
+
+    /*   if (bytes_available)
+       {
+         for (int i = 0; i < bytes_available; i++)
+         {
+           serial_.read(byte_in, 1);
+
+
+         }
+       }*/
 
     // size_t bytes_available = serial_.available();
     //  if (bytes_available)
