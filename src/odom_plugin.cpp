@@ -106,8 +106,7 @@ void OdomPlugin::processPacket(OskarPacket packet)
     int32_t speed_right = (int32_t)((int32_t)packet.data[7] << 24) | ((int32_t)packet.data[6] << 16) |
                           ((int32_t)packet.data[5] << 8) | (packet.data[4]);
 
-    speed_right = 6000;
-    speed_right = 6000;
+    speed_right = 9000;
 
     float v_left = calc_speed_inverse(speed_left, true);
     float v_right = calc_speed_inverse(speed_right);
@@ -125,7 +124,15 @@ void OdomPlugin::processPacket(OskarPacket packet)
     odom_msg_.twist.twist.linear.x = (v_left + v_right) / 2;
     odom_msg_.twist.twist.angular.z = (v_left + v_right) / base_width_;
 
-    if (odom_pub_.getNumSubscribers() > 1)
+    odom_transform_.header.stamp = odom_msg_.header.stamp;
+    odom_transform_.transform.translation.x = (v_left + v_right) / 2;
+    odom_transform_.transform.translation.y = 0;
+    odom_transform_.transform.translation.z = 0;
+    odom_transform_.transform.rotation.x = 0;
+    odom_transform_.transform.rotation.y = (v_left + v_right) / base_width_;
+    odom_transform_.transform.rotation.z = 0;
+    odom_transform_.transform.rotation.w = 0;
+    if (odom_pub_.getNumSubscribers() > 0)
     {
       publish();
     }
@@ -135,7 +142,7 @@ void OdomPlugin::processPacket(OskarPacket packet)
 void OdomPlugin::publish()
 {
   odom_pub_.publish(odom_msg_);
-  //  odom_broadcaster_.sendTransform(odom_transform_);
+  odom_broadcaster_.sendTransform(odom_transform_);
 }
 
 }  // namespace ahhaa_oskar

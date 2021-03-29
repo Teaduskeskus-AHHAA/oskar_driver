@@ -31,7 +31,7 @@ private:
   ros::NodeHandle nh_;
   ros::Subscriber cmd_vel_sub_;
   float base_width_;
-
+  float dx;
   int32_t calc_speed(const geometry_msgs::Twist& cmd_vel_msg, bool left);
   float calc_speed_inverse(int32_t speed, bool left);
 };
