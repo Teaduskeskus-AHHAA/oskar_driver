@@ -115,7 +115,8 @@ std::vector<uint8_t> OskarPacket::getEncapsulatedFrame()
 
 bool OskarPacket::reconstruct(std::vector<uint8_t> data)
 {
-  if (data.size() > 4)
+  ROS_INFO("SENT IN DATA SIZE IS %d", data.size());
+  if (data.size() > 4 && (data.size() == (data[1] + 5)))
   {
     for (int i = 0; i < data.size(); i++)
     {
@@ -136,12 +137,14 @@ bool OskarPacket::reconstruct(std::vector<uint8_t> data)
 
         this->setCommand(data[2]);
         std::vector<uint8_t> encapsulated_escaped_data;
-        encapsulated_escaped_data.insert(encapsulated_escaped_data.end(), &data.at(3), &data.at(3 + (data.at(1))));
+        encapsulated_escaped_data.insert(encapsulated_escaped_data.end(), data.at(3), data.at(3 + data[1]));
 
         this->data = this->getUnescapedData(encapsulated_escaped_data);
       }
     }
+    return true;
   }
+  return false;
 }
 
 }  // namespace ahhaa_oskar
