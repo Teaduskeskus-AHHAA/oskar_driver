@@ -31,10 +31,10 @@ public:
   std::vector<uint8_t> getEncapsulatedFrame();
   bool reconstruct(std::vector<uint8_t> data);
   uint16_t calcCRC(uint16_t crc, uint8_t data);
+  std::vector<uint8_t> data;
 
 private:
   uint8_t command;
-  std::vector<uint8_t> data;
   uint16_t crc16;
   std::vector<uint8_t> encapsulated_frame;
 };

@@ -157,10 +157,17 @@ std::vector<OskarPacket> BoardComms::readPackets(OskarPacket packet, std::string
   OskarPacket pct;
   while (awaiting_data.size() > 0)
   {
-    ROS_INFO("AWAITING DATA IS %d", awaiting_data.size());
     if (pct.reconstruct(awaiting_data.at(0)))
     {
       results.push_back(pct);
+    }
+    else
+    {
+      ROS_ERROR_STREAM("Play the terrible song. https://www.youtube.com/watch?v=t3otBjVZzT0");
+      for (int i = 0; i < awaiting_data[0].size(); i++)
+      {
+        ROS_ERROR("0x%x", awaiting_data[0][i]);
+      }
     }
     awaiting_data.erase(awaiting_data.begin());
   }

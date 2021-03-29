@@ -33,6 +33,7 @@ private:
   float base_width_;
 
   int32_t calc_speed(const geometry_msgs::Twist& cmd_vel_msg, bool left);
+  float calc_speed_inverse(int32_t speed, bool left);
 };
 }  // namespace ahhaa_oskar
 
