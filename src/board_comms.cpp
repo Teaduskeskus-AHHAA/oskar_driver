@@ -158,9 +158,11 @@ std::vector<OskarPacket> BoardComms::readPackets(OskarPacket packet, std::string
   while (awaiting_data.size() > 0)
   {
     ROS_INFO("AWAITING DATA IS %d", awaiting_data.size());
-    pct.reconstruct(awaiting_data.at(0));
+    if (pct.reconstruct(awaiting_data.at(0)))
+    {
+      results.push_back(pct);
+    }
     awaiting_data.erase(awaiting_data.begin());
-    results.push_back(pct);
   }
 
   /*  if ((data_read_buffer.size() > 1) && (data_read_buffer[0] == END) && (data_read[data_read.size() - 1] == END))

@@ -29,7 +29,7 @@ public:
   std::vector<uint8_t> getEscapedData();
   std::vector<uint8_t> getUnescapedData(std::vector<uint8_t> escaped_data);
   std::vector<uint8_t> getEncapsulatedFrame();
-  void reconstruct(std::vector<uint8_t> data);
+  bool reconstruct(std::vector<uint8_t> data);
   uint16_t calcCRC(uint16_t crc, uint8_t data);
 
 private:
