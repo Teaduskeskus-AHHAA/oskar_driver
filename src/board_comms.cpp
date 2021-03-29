@@ -43,7 +43,7 @@ void BoardComms::tryConnect()
   }
 }
 
-void BoardComms::reconnect(const ros::TimerEvent &event)
+void BoardComms::reconnect(const ros::TimerEvent& event)
 {
   if (!serial_.isOpen() || this->reconnect_requested_)
   {
@@ -81,48 +81,89 @@ void BoardComms::send(OskarPacket packet)
   }
 }
 
-bool BoardComms::readPacket(OskarPacket packet, std::string temp_DBG)
+std::vector<OskarPacket> BoardComms::readPackets(OskarPacket packet, std::string temp_DBG)
 {
-  std::vector<uint8_t> data_read;
-
+  std::vector<OskarPacket> results;
   try
   {
+    uint8_t byte_in[1];
+
     size_t bytes_available = serial_.available();
     if (bytes_available)
     {
-      serial_.read(data_read, bytes_available);
-      for (int i = 0; i < data_read.size(); i++)
+      for (int i = 0; i < bytes_available; i++)
       {
-        ROS_INFO("%x ", data_read[i]);
+        serial_.read(byte_in, 1);
+
+        if ((last_byte_in_ == END) && (*byte_in == END) & (data_read.at(0) == END))
+        {
+          awaiting_data.push_back(data_read);
+          data_read.clear();
+        }
+        else if ((last_byte_in_ == END) && (*byte_in == END) & (data_read.at(0) != END))
+        {
+          data_read.clear();
+        }
+
+        data_read.push_back(*byte_in);
+        last_byte_in_ = *byte_in;
       }
-      ROS_INFO("-------------------------");
-      data_read_buffer.insert(this->data_read_buffer.end(), data_read.begin(), data_read.end());
-      // TODO: Implement a timeout for flushing data_read_buffer when it does not form a packet in X amount of time, or
-      // implement method to slice out valid packages from it.
     }
+
+    // size_t bytes_available = serial_.available();
+    //  if (bytes_available)
+    //  {
+    // serial_.read(data_read, bytes_available);
+
+    /* for (int i = 0; i < data_read.size(); i++)
+     {
+       ROS_INFO("%x ", *byte_in);
+     }*/
+
+    /*   serial_.read(data_read, bytes_available);
+       for (int i = 0; i < data_read.size(); i++)
+       {
+         ROS_INFO("%x ", data_read[i]);
+       }*/
+    //   ROS_INFO("-------------------------");
+    //   data_read_buffer.insert(this->data_read_buffer.end(), data_read.begin(), data_read.end());
+    // TODO: Implement a timeout for flushing data_read_buffer when it does not form a packet in X amount of time, or
+    // implement method to slice out valid packages from it.
+    // }
   }
   catch (serial::IOException e)
   {
     reconnect_requested_ = true;
+    ROS_ERROR_STREAM("" << e.what());
   }
   catch (serial::SerialException e)
   {
     reconnect_requested_ = true;
+    ROS_ERROR_STREAM("" << e.what());
   }
-  catch (serial::PortNotOpenedException)
+  catch (serial::PortNotOpenedException e)
   {
     reconnect_requested_ = true;
+    ROS_ERROR_STREAM("" << e.what());
   }
-  ROS_INFO_STREAM("RBSIZE: " << data_read_buffer.size());
 
-  if ((data_read_buffer.size() > 1) && (data_read_buffer[0] == END) && (data_read[data_read.size() - 1] == END))
+  OskarPacket pct;
+  while (awaiting_data.size() > 0)
   {
-    packet.reconstruct(data_read_buffer);
-    data_read_buffer.clear();
-    return true;
+    ROS_INFO("AWAITING DATA IS %d", awaiting_data.size());
+    pct.reconstruct(awaiting_data.at(0));
+    awaiting_data.erase(awaiting_data.begin());
+    results.push_back(pct);
   }
 
-  return false;
-}
+  /*  if ((data_read_buffer.size() > 1) && (data_read_buffer[0] == END) && (data_read[data_read.size() - 1] == END))
+    {
+      packet.reconstruct(data_read_buffer);
+      data_read_buffer.clear();
+      return true;
+    }*/
+
+  return results;
+}  // namespace ahhaa_oskar
 
 }  // namespace ahhaa_oskar

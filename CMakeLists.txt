@@ -8,6 +8,8 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   serial
   geometry_msgs
+  nav_msgs
+  tf
 )
 
 catkin_package(
@@ -15,6 +17,8 @@ catkin_package(
     std_msgs
     geometry_msgs
     serial
+    nav_msgs
+    tf
 )
 
 include_directories(

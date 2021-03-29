@@ -23,15 +23,26 @@ Driver::~Driver()
 
 void Driver::update(const ros::TimerEvent& event)
 {
-  OskarPacket packet;
+  OskarPacket dummy;
+  std::vector<OskarPacket> incoming_packets;
   std::string dbg;
-  if (this->bc_->readPacket(packet, dbg))
+
+  incoming_packets = this->bc_->readPackets(dummy, dbg);
+  for (int i = 0; i < incoming_packets.size(); i++)
   {
     for (auto& plugin : plugins_)
     {
-      plugin->processPacket(packet);
+      plugin->processPacket(incoming_packets.at(i));
     }
   }
+
+  /* if (this->bc_->readPacket(packet, dbg))
+   {
+     for (auto& plugin : plugins_)
+     {
+       plugin->processPacket(packet);
+     }
+   }*/
   // ROS_INFO("Oskar III Update");
 }
 }  // namespace ahhaa_oskar
