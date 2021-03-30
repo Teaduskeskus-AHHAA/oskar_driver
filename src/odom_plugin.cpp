@@ -30,10 +30,10 @@ int32_t OdomPlugin::calc_speed(const geometry_msgs::Twist& cmd_vel_msg, bool lef
   return speed;
 }
 
-float OdomPlugin::calc_speed_inverse(int32_t speed, bool left = false)
+float OdomPlugin::calc_speed_inverse(int32_t speed, float theta, bool left = false)
 {
   int divider = left ? -2 : 2;
-  float mps = ((speed / 6) / 57.29578) * 0.084;
+  float mps = (((speed / 6) / 57.29578) * 0.084);
   float vel = mps - (this->base_width_ / divider);
   return vel;
 }
@@ -106,26 +106,31 @@ void OdomPlugin::processPacket(OskarPacket packet)
     int32_t speed_right = (int32_t)((int32_t)packet.data[7] << 24) | ((int32_t)packet.data[6] << 16) |
                           ((int32_t)packet.data[5] << 8) | (packet.data[4]);
 
-    speed_right = 9000;
+    speed_right = 1200;
+    speed_left = 1200;
 
-    float v_left = calc_speed_inverse(speed_left, true);
-    float v_right = calc_speed_inverse(speed_right);
+    float theta = (speed_right - speed_left) / base_width_;
 
-    ROS_INFO("%f %f", v_left, v_right);
+    float v_left = calc_speed_inverse(speed_left, theta, true);
+    float v_right = calc_speed_inverse(speed_right, theta);
 
-    geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw((v_left + v_right) / base_width_);
+    float v_wx = ((v_right - v_left) / 2) * cos(theta) - 0 * sin(theta);
+
+    ROS_INFO("%f %f %f", v_left, v_right, theta);
+
+    geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(theta);
 
     odom_msg_.header.stamp = ros::Time::now();
-    odom_msg_.pose.pose.position.x = (v_left + v_right) / 2;
+    odom_msg_.pose.pose.position.x = v_wx;
     odom_msg_.pose.pose.position.y = 0;
     odom_msg_.pose.pose.position.z = 0;
     odom_msg_.pose.pose.orientation = odom_quat;
 
-    odom_msg_.twist.twist.linear.x = (v_left + v_right) / 2;
+    odom_msg_.twist.twist.linear.x = v_wx;
     odom_msg_.twist.twist.angular.z = (v_left + v_right) / base_width_;
 
     odom_transform_.header.stamp = odom_msg_.header.stamp;
-    odom_transform_.transform.translation.x = (v_left + v_right) / 2;
+    odom_transform_.transform.translation.x = v_wx;
     odom_transform_.transform.translation.y = 0;
     odom_transform_.transform.translation.z = 0;
     odom_transform_.transform.rotation = odom_quat;

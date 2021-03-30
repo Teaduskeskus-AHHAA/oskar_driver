@@ -3,6 +3,7 @@
 #include <nav_msgs/Odometry.h>
 #include <oskar_driver/plugin.h>
 #include <ros/ros.h>
+#include <std_msgs/Float64.h>
 #include <tf/transform_broadcaster.h>
 #include <vector>
 
@@ -33,7 +34,7 @@ private:
   float base_width_;
   float dx;
   int32_t calc_speed(const geometry_msgs::Twist& cmd_vel_msg, bool left);
-  float calc_speed_inverse(int32_t speed, bool left);
+  float calc_speed_inverse(int32_t speed, float theta, bool left);
 };
 }  // namespace ahhaa_oskar
 
