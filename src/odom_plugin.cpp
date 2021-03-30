@@ -107,7 +107,7 @@ void OdomPlugin::processPacket(OskarPacket packet)
                           ((int32_t)packet.data[5] << 8) | (packet.data[4]);
 
     speed_right = 2046;
-    speed_left = 0;
+    speed_left = 2056;
 
     float theta = (speed_right - speed_left) / base_width_;
 

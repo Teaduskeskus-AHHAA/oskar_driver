@@ -30,7 +30,7 @@ void MotorPlugin::cmd_vel_callback(const geometry_msgs::Twist& cmd_vel_msg)
   int32_t left_speed = this->calc_speed(cmd_vel_msg, true);
   int32_t right_speed = this->calc_speed(cmd_vel_msg);
 
-  ROS_INFO("SEND %d %d", left_speed, right_speed);
+  ROS_INFO_STREAM(cmd_vel_msg);
 
   this->data.clear();
   this->data.push_back(LEFT_MOTOR);
