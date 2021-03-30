@@ -128,10 +128,8 @@ void OdomPlugin::processPacket(OskarPacket packet)
     odom_transform_.transform.translation.x = (v_left + v_right) / 2;
     odom_transform_.transform.translation.y = 0;
     odom_transform_.transform.translation.z = 0;
-    odom_transform_.transform.rotation.x = 0;
-    odom_transform_.transform.rotation.y = (v_left + v_right) / base_width_;
-    odom_transform_.transform.rotation.z = 0;
-    odom_transform_.transform.rotation.w = 0;
+    odom_transform_.transform.rotation = odom_quat;
+
     if (odom_pub_.getNumSubscribers() > 0)
     {
       publish();
