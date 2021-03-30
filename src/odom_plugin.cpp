@@ -34,7 +34,7 @@ float OdomPlugin::calc_speed_inverse(int32_t speed, float theta, bool left = fal
 {
   int divider = left ? -2 : 2;
   float mps = (((speed / 6) / 57.29578) * 0.084);
-  float vel = mps - (this->base_width_ / divider);
+  float vel = mps - ((this->base_width_ * theta) / divider);
   return vel;
 }
 
@@ -106,8 +106,8 @@ void OdomPlugin::processPacket(OskarPacket packet)
     int32_t speed_right = (int32_t)((int32_t)packet.data[7] << 24) | ((int32_t)packet.data[6] << 16) |
                           ((int32_t)packet.data[5] << 8) | (packet.data[4]);
 
-    speed_right = 6000;
-    speed_left = 9000;
+    speed_right = 2046;
+    speed_left = 0;
 
     float theta = (speed_right - speed_left) / base_width_;
 
@@ -127,7 +127,7 @@ void OdomPlugin::processPacket(OskarPacket packet)
     odom_msg_.pose.pose.orientation = odom_quat;
 
     odom_msg_.twist.twist.linear.x = v_wx;
-    odom_msg_.twist.twist.angular.z = (v_left + v_right) / base_width_;
+    odom_msg_.twist.twist.angular.z = theta;
 
     odom_transform_.header.stamp = odom_msg_.header.stamp;
     odom_transform_.transform.translation.x = v_wx;
