@@ -107,9 +107,9 @@ void OdomPlugin::processPacket(OskarPacket packet)
                           ((int32_t)packet.data[5] << 8) | (packet.data[4]);
 
     speed_right = 2046;
-    speed_left = 2056;
+    speed_left = 2046;
 
-    float theta = (speed_right - speed_left) / base_width_;
+    float theta = (speed_right / 6 - speed_left / 6) / base_width_;
 
     float v_left = calc_speed_inverse(speed_left, theta, true);
     float v_right = calc_speed_inverse(speed_right, theta);

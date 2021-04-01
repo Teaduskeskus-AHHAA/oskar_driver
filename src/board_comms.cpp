@@ -180,6 +180,5 @@ std::vector<OskarPacket> BoardComms::readPackets(OskarPacket packet, std::string
     }*/
 
   return results;
-}  // namespace ahhaa_oskar
-
+}
 }  // namespace ahhaa_oskar
