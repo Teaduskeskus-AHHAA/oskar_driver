@@ -10,7 +10,12 @@ OdomPlugin::OdomPlugin(BoardComms* comms, std::string name) : Plugin(comms, name
 
   this->base_width_ = 0.600;
 
+  x = 0;
+  th = 0;
+
   reset();
+
+  last_time_ = ros::Time::now();
 
   // Initialize odom publisher
   odom_pub_ = nh_.advertise<nav_msgs::Odometry>("odom", 2);
@@ -52,6 +57,9 @@ void OdomPlugin::setChildFrameId(const std::string& child_frame_id)
 
 void OdomPlugin::reset()
 {
+  x = 0;
+  th = 0;
+
   odom_msg_.header.stamp = ros::Time::now();
   odom_msg_.pose.pose.position.x = 0;
   odom_msg_.pose.pose.position.y = 0;
@@ -101,27 +109,31 @@ void OdomPlugin::processPacket(OskarPacket packet)
 
   if (packet.getCommand() == ODOM_COMMAND)
   {
+    ros::Time current_time = ros::Time::now();
+
+    double dt = (current_time - last_time_).toSec();
+
     int32_t speed_left = (int32_t)((int32_t)packet.data[3] << 24) | ((int32_t)packet.data[2] << 16) |
                          ((int32_t)packet.data[1] << 8) | (packet.data[0]);
     int32_t speed_right = (int32_t)((int32_t)packet.data[7] << 24) | ((int32_t)packet.data[6] << 16) |
                           ((int32_t)packet.data[5] << 8) | (packet.data[4]);
 
-    speed_right = 2046;
-    speed_left = 2046;
-
     float theta = (speed_right / 6 - speed_left / 6) / base_width_;
 
-    float v_left = calc_speed_inverse(speed_left, theta, true);
-    float v_right = calc_speed_inverse(speed_right, theta);
+    float v_left = calc_speed_inverse(speed_left, theta, true) * dt;
+    float v_right = calc_speed_inverse(speed_right, theta) * dt;
 
     float v_wx = ((v_right + v_left) / 2) * cos(theta) - 0 * sin(theta);
 
-    ROS_INFO("%f %f %f", v_left, v_right, theta);
+    x += v_wx;
+    th += theta * dt;
 
-    geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(theta);
+    ROS_INFO("%f %f %f %f", v_left, v_right, theta, dt);
 
-    odom_msg_.header.stamp = ros::Time::now();
-    odom_msg_.pose.pose.position.x = v_wx;
+    geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(th);
+
+    odom_msg_.header.stamp = current_time;
+    odom_msg_.pose.pose.position.x = x;
     odom_msg_.pose.pose.position.y = 0;
     odom_msg_.pose.pose.position.z = 0;
     odom_msg_.pose.pose.orientation = odom_quat;
@@ -130,7 +142,7 @@ void OdomPlugin::processPacket(OskarPacket packet)
     odom_msg_.twist.twist.angular.z = theta;
 
     odom_transform_.header.stamp = odom_msg_.header.stamp;
-    odom_transform_.transform.translation.x = v_wx;
+    odom_transform_.transform.translation.x = x;
     odom_transform_.transform.translation.y = 0;
     odom_transform_.transform.translation.z = 0;
     odom_transform_.transform.rotation = odom_quat;
@@ -138,6 +150,7 @@ void OdomPlugin::processPacket(OskarPacket packet)
     if (odom_pub_.getNumSubscribers() > 0)
     {
       publish();
+      last_time_ = current_time;
     }
   }
 }

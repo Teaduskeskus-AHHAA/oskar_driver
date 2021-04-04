@@ -11,7 +11,7 @@ Driver::Driver()
 
   timer_ = nh_.createTimer(ros::Duration(0.01), &Driver::update, this);
 
-  this->bc_ = new BoardComms("/dev/ttyUSB0", 9600);
+  this->bc_ = new BoardComms("/dev/ttyUSB0", 115200);
   this->plugins_.emplace_back(std::make_shared<MotorPlugin>(this->bc_, "MotorPlugin"));
   this->plugins_.emplace_back(std::make_shared<OdomPlugin>(this->bc_, "OdomPlugin"));
 }

@@ -33,12 +33,10 @@ void MotorPlugin::cmd_vel_callback(const geometry_msgs::Twist& cmd_vel_msg)
   ROS_INFO_STREAM(cmd_vel_msg);
 
   this->data.clear();
-  this->data.push_back(LEFT_MOTOR);
   this->data.push_back(left_speed & 0xFF);
   this->data.push_back((left_speed >> 8) & 0xFF);
   this->data.push_back((left_speed >> 16) & 0xFF);
   this->data.push_back((left_speed >> 24) & 0xFF);
-  this->data.push_back(RIGHT_MOTOR);
   this->data.push_back(right_speed & 0xFF);
   this->data.push_back((right_speed >> 8) & 0xFF);
   this->data.push_back((right_speed >> 16) & 0xFF);
