@@ -1,0 +1,13 @@
+# Parameters for Oskar III.
+
+# Serial connection
+serial:
+  port: "/dev/ttyACM0"
+  baudrate: 115200
+
+# Physical properties
+
+phys:
+  wheel_diam_m: 0.150
+  wheel_dist_m: 0.600 
+  wheel_gear_ratio: 6

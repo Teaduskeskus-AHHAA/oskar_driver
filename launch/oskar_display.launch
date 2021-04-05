@@ -4,7 +4,13 @@
   <arg name="gui" default="True" />
 
   <node pkg="joy" name="joy" type="joy_node" output="screen"/>
-  <node pkg="teleop_twist_joy" name="teleop_node" type="teleop_node" output="screen" />
+
+  <node pkg="teleop_twist_joy" name="teleop_node" type="teleop_node" output="screen">
+    <param name="scale_linear" value="0.1" />
+    <param name="scale_angular" value="0.1" />
+  </node>
+
+  <rosparam file="$(find oskar_driver)/config/oskar_params.yaml" subst_value="true" command="load" />
   <node pkg="oskar_driver" name="oskar_driver_node" type="ahhaa_oskar_driver_node" output="screen" />
 
     <arg name="rvizconfig" default="$(find oskar_driver)/display.rviz" />

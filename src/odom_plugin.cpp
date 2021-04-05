@@ -11,6 +11,7 @@ OdomPlugin::OdomPlugin(BoardComms* comms, std::string name) : Plugin(comms, name
   this->base_width_ = 0.600;
 
   x = 0;
+  y = 0;
   th = 0;
 
   reset();
@@ -37,6 +38,7 @@ int32_t OdomPlugin::calc_speed(const geometry_msgs::Twist& cmd_vel_msg, bool lef
 
 float OdomPlugin::calc_speed_inverse(int32_t speed, float theta, bool left = false)
 {
+  // speed = left ? speed * -1 : speed;
   int divider = left ? -2 : 2;
   float mps = (((speed / 6) / 57.29578) * 0.084);
   float vel = mps - ((this->base_width_ * theta) / divider);
@@ -79,30 +81,6 @@ void OdomPlugin::reset()
   odom_transform_.transform.rotation.w = 0;
 }
 
-/*void OdomPlugin::cmd_vel_callback(const geometry_msgs::Twist& cmd_vel_msg)
-{
-  OskarPacket packet;
-  packet.setCommand(DRIVESPEEDS_COMMAND);
-
-  int32_t left_speed = this->calc_speed(cmd_vel_msg, true);
-  int32_t right_speed = this->calc_speed(cmd_vel_msg);
-  this->data.clear();
-  this->data.push_back(LEFT_Odom);
-  this->data.push_back(left_speed & 0xFF);
-  this->data.push_back((left_speed >> 8) & 0xFF);
-  this->data.push_back((left_speed >> 16) & 0xFF);
-  this->data.push_back((left_speed >> 24) & 0xFF);
-  this->data.push_back(RIGHT_Odom);
-  this->data.push_back(right_speed & 0xFF);
-  this->data.push_back((right_speed >> 8) & 0xFF);
-  this->data.push_back((right_speed >> 16) & 0xFF);
-  this->data.push_back((right_speed >> 24) & 0xFF);
-
-  packet.setData(this->data);
-  packet.encapsulate();
-  this->comms_->send(packet);
-}
-*/
 void OdomPlugin::processPacket(OskarPacket packet)
 {
   // ROS_INFO("Odom has at least a packet w command %x", packet.getCommand());
@@ -123,18 +101,22 @@ void OdomPlugin::processPacket(OskarPacket packet)
     float v_left = calc_speed_inverse(speed_left, theta, true) * dt;
     float v_right = calc_speed_inverse(speed_right, theta) * dt;
 
-    float v_wx = ((v_right + v_left) / 2) * cos(theta) - 0 * sin(theta);
-
-    x += v_wx;
     th += theta * dt;
 
-    // ROS_INFO("%f %f %f %f", v_left, v_right, theta, dt);
+    float v_wx = ((v_right + v_left) / 2) * cos(th) - 0 * sin(th);
+
+    float v_wy = ((v_right + v_left) / 2) * sin(th) + 0 * cos(th);
+
+    y += v_wy;
+    x += v_wx;
+
+    //    ROS_INFO("%f %f %f %f", x, y, th, dt);
 
     geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(th);
 
     odom_msg_.header.stamp = current_time;
     odom_msg_.pose.pose.position.x = x;
-    odom_msg_.pose.pose.position.y = 0;
+    odom_msg_.pose.pose.position.y = y;
     odom_msg_.pose.pose.position.z = 0;
     odom_msg_.pose.pose.orientation = odom_quat;
 
@@ -143,7 +125,7 @@ void OdomPlugin::processPacket(OskarPacket packet)
 
     odom_transform_.header.stamp = odom_msg_.header.stamp;
     odom_transform_.transform.translation.x = x;
-    odom_transform_.transform.translation.y = 0;
+    odom_transform_.transform.translation.y = y;
     odom_transform_.transform.translation.z = 0;
     odom_transform_.transform.rotation = odom_quat;
 

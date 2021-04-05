@@ -5,7 +5,9 @@ namespace ahhaa_oskar
 MotorPlugin::MotorPlugin(BoardComms* comms, std::string name) : Plugin(comms, name)
 {
   cmd_vel_sub_ = nh_.subscribe("cmd_vel", 1, &MotorPlugin::cmd_vel_callback, this);
-  this->base_width_ = 0.600;
+  this->nh_.getParam("phys/wheel_diam_m", wheel_diam_m_);
+  this->nh_.getParam("phys/wheel_dist_m", wheel_dist_m_);
+  this->nh_.getParam("phys/wheel_gear_ratio", wheel_gear_ratio_);
 }
 
 MotorPlugin::~MotorPlugin()
@@ -14,11 +16,16 @@ MotorPlugin::~MotorPlugin()
 
 int32_t MotorPlugin::calc_speed(const geometry_msgs::Twist& cmd_vel_msg, bool left = false)
 {
-  int divider = left ? -2 : 2;
-  float mps = (cmd_vel_msg.linear.x + ((this->base_width_ / divider) * cmd_vel_msg.angular.z));
-  float radps = mps / 0.084;
-  float dps = radps * 57.29578;
-  int32_t speed = dps * 6;
+  int32_t speed = 0;
+
+  /* int divider = left ? -2 : 2;
+   float mps = (cmd_vel_msg.linear.x + ((this->base_width_ / divider) * cmd_vel_msg.angular.z));
+   float radps = mps / 0.084;
+   float dps = radps * 57.29578;  // TODO: Comment magic numbers
+   int32_t speed = dps * 6;
+
+   speed = left ? speed * -1 : speed;*/
+
   return speed;
 }
 
@@ -27,12 +34,24 @@ void MotorPlugin::cmd_vel_callback(const geometry_msgs::Twist& cmd_vel_msg)
   OskarPacket packet;
   packet.setCommand(DRIVESPEEDS_COMMAND);
 
-  int32_t left_speed = this->calc_speed(cmd_vel_msg, true);
-  int32_t right_speed = this->calc_speed(cmd_vel_msg);
+  /*int32_t left_speed = this->calc_speed(cmd_vel_msg, true);
+  int32_t right_speed = this->calc_speed(cmd_vel_msg);*/
 
-  // ROS_INFO_STREAM(cmd_vel_msg);
+  double vel_left_desired = -(cmd_vel_msg.linear.x - cmd_vel_msg.angular.z * wheel_dist_m_ / 2.0) / (wheel_diam_m_ / 2);
+  double vel_right_desired = (cmd_vel_msg.linear.x + cmd_vel_msg.angular.z * wheel_dist_m_ / 2.0) / (wheel_diam_m_ / 2);
 
-  this->data.clear();
+  double rad_per_s_left = vel_left_desired / (wheel_diam_m_ / 2);
+  double rad_per_s_right = vel_right_desired / (wheel_diam_m_ / 2);
+
+  double degrees_per_s_left = (rad_per_s_left * 180) / M_PI;
+  double degrees_per_s_right = (rad_per_s_right * 180) / M_PI;
+
+  double left_speed = degrees_per_s_left * wheel_gear_ratio_;
+  double right_speed = degrees_per_s_right * wheel_gear_ratio_;
+
+  ROS_INFO_STREAM(" " << left_speed << " R: " << right_speed);
+
+  /*this->data.clear();
   this->data.push_back(left_speed & 0xFF);
   this->data.push_back((left_speed >> 8) & 0xFF);
   this->data.push_back((left_speed >> 16) & 0xFF);
@@ -44,7 +63,7 @@ void MotorPlugin::cmd_vel_callback(const geometry_msgs::Twist& cmd_vel_msg)
 
   packet.setData(this->data);
   packet.encapsulate();
-  this->comms_->send(packet);
+  this->comms_->send(packet);*/
 }
 
 void MotorPlugin::processPacket(OskarPacket packet)
