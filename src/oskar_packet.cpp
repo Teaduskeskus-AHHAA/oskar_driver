@@ -115,13 +115,13 @@ std::vector<uint8_t> OskarPacket::getEncapsulatedFrame()
 
 bool OskarPacket::reconstruct(std::vector<uint8_t> data)
 {
-  if (data.size() > 4 && (data.size() == (data[1] + 5)))
+  if (data.size() > 6 && (data.size() == (data[1] + 5)))
   {
     if ((data.at(0) == END) && (data.at(data.size() - 1) == END))
     {
       uint16_t crc_read = data.at(data.size() - 3) | (data.at(data.size() - 2) << 8);
       uint16_t crc = 0, i;
-      for (i = 4; i < data.size() - 3; i++)
+      for (i = 3; i < data.size() - 3; i++)
       {
         crc = calcCRC(crc, data[i]);
       }
@@ -129,12 +129,29 @@ bool OskarPacket::reconstruct(std::vector<uint8_t> data)
       {
         this->setCommand(data[2]);
         std::vector<uint8_t> encapsulated_escaped_data;
-        encapsulated_escaped_data.insert(encapsulated_escaped_data.end(), &data.at(3), &data.at(3 + data[1]));
+        encapsulated_escaped_data.insert(encapsulated_escaped_data.end(), &data.at(3), &data.at(3 + data[1] - 1));
 
         this->data = this->getUnescapedData(encapsulated_escaped_data);
       }
+      else
+      {
+        ROS_ERROR_STREAM("FAILED CRC CHECK");
+      }
+    }
+    else
+    {
+      ROS_ERROR_STREAM("FAILED ENDS CHECK");
     }
     return true;
+  }
+  else
+  {
+    ROS_ERROR_STREAM("FAILED SIZE CHECK");
+
+    for (int i = 0; i < data.size(); i++)
+    {
+      ROS_INFO("%d: 0x%x\r\n", i, data[i]);
+    }
   }
   return false;
 }

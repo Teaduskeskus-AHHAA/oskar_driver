@@ -128,7 +128,7 @@ void OdomPlugin::processPacket(OskarPacket packet)
     x += v_wx;
     th += theta * dt;
 
-    ROS_INFO("%f %f %f %f", v_left, v_right, theta, dt);
+    // ROS_INFO("%f %f %f %f", v_left, v_right, theta, dt);
 
     geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(th);
 
