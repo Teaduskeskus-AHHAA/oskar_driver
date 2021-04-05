@@ -124,14 +124,15 @@ void OdomPlugin::processPacket(OskarPacket packet)
 
     double v_robot_x = (vel_right + vel_left) / 2;
     double v_robot_y = 0;
-    double theta = (vel_right - vel_left) / wheel_dist_m_;
 
-    double v_world_x = v_robot_x * cos(theta) - v_robot_y * sin(theta);
-    double v_world_y = v_robot_x * sin(theta) + v_robot_y * cos(theta);
+    double theta = (vel_right - vel_left) / wheel_dist_m_;
+    th += theta * dt;
+
+    double v_world_x = v_robot_x * cos(th) - v_robot_y * sin(th);
+    double v_world_y = v_robot_x * sin(th) + v_robot_y * cos(th);
 
     x += v_world_x * dt;
     y += v_world_y * dt;
-    th += theta * dt;
 
     geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(th);
 
@@ -149,8 +150,6 @@ void OdomPlugin::processPacket(OskarPacket packet)
     odom_transform_.transform.translation.y = y;
     odom_transform_.transform.translation.z = 0;
     odom_transform_.transform.rotation = odom_quat;
-
-    ROS_INFO(" %f %f ", vel_left, vel_right);
 
     if (odom_pub_.getNumSubscribers() > 0)
     {
