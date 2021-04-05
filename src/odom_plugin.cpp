@@ -87,30 +87,51 @@ void OdomPlugin::processPacket(OskarPacket packet)
 
   if (packet.getCommand() == ODOM_COMMAND)
   {
-    ros::Time current_time = ros::Time::now();
+    /*
 
+    double vel_left_desired = (cmd_vel_msg.linear.x - cmd_vel_msg.angular.z * wheel_dist_m_ / 2.0) / (wheel_diam_m_ /
+  2); double vel_right_desired = (cmd_vel_msg.linear.x + cmd_vel_msg.angular.z * wheel_dist_m_ / 2.0) / (wheel_diam_m_ /
+  2);
+
+  double rad_per_s_left = vel_left_desired / (wheel_diam_m_ / 2);
+  double rad_per_s_right = vel_right_desired / (wheel_diam_m_ / 2);
+
+  double degrees_per_s_left = (rad_per_s_left * 180) / M_PI;
+  double degrees_per_s_right = (rad_per_s_right * 180) / M_PI;
+
+  int32_t left_speed = degrees_per_s_left * wheel_gear_ratio_;
+  int32_t right_speed = degrees_per_s_right * wheel_gear_ratio_;
+
+    */
+
+    ros::Time current_time = ros::Time::now();
+    double delta_time = (current_time - last_time_).toSec();
     double dt = (current_time - last_time_).toSec();
 
-    int32_t speed_left = (int32_t)((int32_t)packet.data[3] << 24) | ((int32_t)packet.data[2] << 16) |
-                         ((int32_t)packet.data[1] << 8) | (packet.data[0]);
-    int32_t speed_right = (int32_t)((int32_t)packet.data[7] << 24) | ((int32_t)packet.data[6] << 16) |
-                          ((int32_t)packet.data[5] << 8) | (packet.data[4]);
+    int32_t in_motorspeed_left = (int32_t)((int32_t)packet.data[3] << 24) | ((int32_t)packet.data[2] << 16) |
+                                 ((int32_t)packet.data[1] << 8) | (packet.data[0]);
+    int32_t in_motorspeed_right = (int32_t)((int32_t)packet.data[7] << 24) | ((int32_t)packet.data[6] << 16) |
+                                  ((int32_t)packet.data[5] << 8) | (packet.data[4]);
 
-    float theta = (speed_right / 6 - speed_left / 6) / base_width_;
+    double degrees_per_s_left = -in_motorspeed_left / wheel_gear_ratio_;
+    double degrees_per_s_right = in_motorspeed_right / wheel_gear_ratio_;
 
-    float v_left = calc_speed_inverse(speed_left, theta, true) * dt;
-    float v_right = calc_speed_inverse(speed_right, theta) * dt;
+    double radians_per_s_left = (M_PI * degrees_per_s_left) / 180;
+    double radians_per_s_right = (M_PI * degrees_per_s_right) / 180;
 
+    double vel_left = (radians_per_s_left * wheel_diam_m_) / 2;
+    double vel_right = (radians_per_s_right * wheel_diam_m_) / 2;
+
+    double v_robot_x = (vel_right + vel_left) / 2;
+    double v_robot_y = 0;
+    double theta = (vel_right - vel_left) / wheel_dist_m_;
+
+    double v_world_x = v_robot_x * cos(theta) - v_robot_y * sin(theta);
+    double v_world_y = v_robot_x * sin(theta) + v_robot_y * cos(theta);
+
+    x += v_world_x * dt;
+    y += v_world_y * dt;
     th += theta * dt;
-
-    float v_wx = ((v_right + v_left) / 2) * cos(th) - 0 * sin(th);
-
-    float v_wy = ((v_right + v_left) / 2) * sin(th) + 0 * cos(th);
-
-    y += v_wy;
-    x += v_wx;
-
-    //    ROS_INFO("%f %f %f %f", x, y, th, dt);
 
     geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(th);
 
@@ -120,7 +141,7 @@ void OdomPlugin::processPacket(OskarPacket packet)
     odom_msg_.pose.pose.position.z = 0;
     odom_msg_.pose.pose.orientation = odom_quat;
 
-    odom_msg_.twist.twist.linear.x = v_wx;
+    odom_msg_.twist.twist.linear.x = v_robot_x;
     odom_msg_.twist.twist.angular.z = theta;
 
     odom_transform_.header.stamp = odom_msg_.header.stamp;
@@ -128,6 +149,8 @@ void OdomPlugin::processPacket(OskarPacket packet)
     odom_transform_.transform.translation.y = y;
     odom_transform_.transform.translation.z = 0;
     odom_transform_.transform.rotation = odom_quat;
+
+    ROS_INFO(" %f %f ", vel_left, vel_right);
 
     if (odom_pub_.getNumSubscribers() > 0)
     {

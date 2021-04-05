@@ -25,7 +25,9 @@ private:
 
 protected:
   BoardComms* comms_;
-  json data_;
+  double wheel_diam_m_;
+  double wheel_gear_ratio_;
+  double wheel_dist_m_;
 };
 typedef std::shared_ptr<Plugin> PluginPtr;
 }  // namespace ahhaa_oskar
