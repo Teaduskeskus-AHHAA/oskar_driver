@@ -147,11 +147,6 @@ bool OskarPacket::reconstruct(std::vector<uint8_t> data)
   else
   {
     ROS_ERROR_STREAM("FAILED SIZE CHECK");
-
-    for (int i = 0; i < data.size(); i++)
-    {
-      ROS_INFO("%d: 0x%x\r\n", i, data[i]);
-    }
   }
   return false;
 }

@@ -88,8 +88,6 @@ std::vector<OskarPacket> BoardComms::readPackets(OskarPacket packet, std::string
   {
     uint8_t byte_in[1];
 
-    // size_t bytes_available = serial_.available();
-
     while (serial_.available())
     {
       serial_.read(byte_in, 1);
@@ -106,37 +104,6 @@ std::vector<OskarPacket> BoardComms::readPackets(OskarPacket packet, std::string
       data_read.push_back(*byte_in);
       last_byte_in_ = *byte_in;
     }
-
-    /*   if (bytes_available)
-       {
-         for (int i = 0; i < bytes_available; i++)
-         {
-           serial_.read(byte_in, 1);
-
-
-         }
-       }*/
-
-    // size_t bytes_available = serial_.available();
-    //  if (bytes_available)
-    //  {
-    // serial_.read(data_read, bytes_available);
-
-    /* for (int i = 0; i < data_read.size(); i++)
-     {
-       ROS_INFO("%x ", *byte_in);
-     }*/
-
-    /*   serial_.read(data_read, bytes_available);
-       for (int i = 0; i < data_read.size(); i++)
-       {
-         ROS_INFO("%x ", data_read[i]);
-       }*/
-    //   ROS_INFO("-------------------------");
-    //   data_read_buffer.insert(this->data_read_buffer.end(), data_read.begin(), data_read.end());
-    // TODO: Implement a timeout for flushing data_read_buffer when it does not form a packet in X amount of time, or
-    // implement method to slice out valid packages from it.
-    // }
   }
   catch (serial::IOException e)
   {

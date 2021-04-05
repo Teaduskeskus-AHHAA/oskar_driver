@@ -5,7 +5,11 @@ namespace ahhaa_oskar
 MotorPlugin::MotorPlugin(BoardComms* comms, std::string name) : Plugin(comms, name)
 {
   cmd_vel_sub_ = nh_.subscribe("cmd_vel", 1, &MotorPlugin::cmd_vel_callback, this);
+  this->nh_.getParam("phys/wheel_diam_m", wheel_diam_m_);
+  this->nh_.getParam("phys/wheel_dist_m", wheel_dist_m_);
+  this->nh_.getParam("phys/wheel_gear_ratio", wheel_gear_ratio_);
 }
+
 MotorPlugin::~MotorPlugin()
 {
 }
@@ -14,14 +18,6 @@ int32_t MotorPlugin::calc_speed(const geometry_msgs::Twist& cmd_vel_msg, bool le
 {
   int32_t speed = 0;
 
-  /* int divider = left ? -2 : 2;
-   float mps = (cmd_vel_msg.linear.x + ((this->base_width_ / divider) * cmd_vel_msg.angular.z));
-   float radps = mps / 0.084;
-   float dps = radps * 57.29578;  // TODO: Comment magic numbers
-   int32_t speed = dps * 6;
-
-   speed = left ? speed * -1 : speed;*/
-
   return speed;
 }
 
@@ -29,9 +25,6 @@ void MotorPlugin::cmd_vel_callback(const geometry_msgs::Twist& cmd_vel_msg)
 {
   OskarPacket packet;
   packet.setCommand(DRIVESPEEDS_COMMAND);
-
-  /*int32_t left_speed = this->calc_speed(cmd_vel_msg, true);
-  int32_t right_speed = this->calc_speed(cmd_vel_msg);*/
 
   double vel_left_desired = (cmd_vel_msg.linear.x - cmd_vel_msg.angular.z * wheel_dist_m_ / 2.0) / (wheel_diam_m_ / 2);
   double vel_right_desired = (cmd_vel_msg.linear.x + cmd_vel_msg.angular.z * wheel_dist_m_ / 2.0) / (wheel_diam_m_ / 2);

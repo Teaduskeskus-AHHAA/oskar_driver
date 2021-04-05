@@ -10,8 +10,10 @@ Driver::Driver()
   ROS_INFO("Initializing Oskar-III driver");
 
   timer_ = nh_.createTimer(ros::Duration(0.01), &Driver::update, this);
+  int baudrate;
+  nh_.getParam("serial/baudrate", baudrate);
+  this->bc_ = new BoardComms("/dev/ttyUSB0", baudrate);
 
-  this->bc_ = new BoardComms("/dev/ttyUSB0", 115200);
   this->plugins_.emplace_back(std::make_shared<MotorPlugin>(this->bc_, "MotorPlugin"));
   this->plugins_.emplace_back(std::make_shared<OdomPlugin>(this->bc_, "OdomPlugin"));
 }
@@ -35,14 +37,5 @@ void Driver::update(const ros::TimerEvent& event)
       plugin->processPacket(incoming_packets.at(i));
     }
   }
-
-  /* if (this->bc_->readPacket(packet, dbg))
-   {
-     for (auto& plugin : plugins_)
-     {
-       plugin->processPacket(packet);
-     }
-   }*/
-  // ROS_INFO("Oskar III Update");
 }
 }  // namespace ahhaa_oskar

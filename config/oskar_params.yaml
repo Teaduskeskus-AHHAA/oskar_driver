@@ -2,7 +2,6 @@
 
 # Serial connection
 serial:
-  port: "/dev/ttyACM0"
   baudrate: 115200
 
 # Physical properties

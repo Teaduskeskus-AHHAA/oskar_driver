@@ -21,6 +21,10 @@ private:
   ros::Subscriber cmd_vel_sub_;
   std::vector<uint8_t> data;
 
+  double wheel_diam_m_;
+  double wheel_gear_ratio_;
+  double wheel_dist_m_;
+
   int32_t calc_speed(const geometry_msgs::Twist& cmd_vel_msg, bool left);
   void cmd_vel_callback(const geometry_msgs::Twist& cmd_vel_msg);
 };

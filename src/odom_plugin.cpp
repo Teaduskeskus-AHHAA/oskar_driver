@@ -20,6 +20,9 @@ OdomPlugin::OdomPlugin(BoardComms* comms, std::string name) : Plugin(comms, name
 
   // Initialize odom publisher
   odom_pub_ = nh_.advertise<nav_msgs::Odometry>("odom", 2);
+  this->nh_.getParam("phys/wheel_diam_m", wheel_diam_m_);
+  this->nh_.getParam("phys/wheel_dist_m", wheel_dist_m_);
+  this->nh_.getParam("phys/wheel_gear_ratio", wheel_gear_ratio_);
 }
 
 OdomPlugin::~OdomPlugin()
@@ -60,6 +63,7 @@ void OdomPlugin::setChildFrameId(const std::string& child_frame_id)
 void OdomPlugin::reset()
 {
   x = 0;
+  y = 0;
   th = 0;
 
   odom_msg_.header.stamp = ros::Time::now();
@@ -87,23 +91,6 @@ void OdomPlugin::processPacket(OskarPacket packet)
 
   if (packet.getCommand() == ODOM_COMMAND)
   {
-    /*
-
-    double vel_left_desired = (cmd_vel_msg.linear.x - cmd_vel_msg.angular.z * wheel_dist_m_ / 2.0) / (wheel_diam_m_ /
-  2); double vel_right_desired = (cmd_vel_msg.linear.x + cmd_vel_msg.angular.z * wheel_dist_m_ / 2.0) / (wheel_diam_m_ /
-  2);
-
-  double rad_per_s_left = vel_left_desired / (wheel_diam_m_ / 2);
-  double rad_per_s_right = vel_right_desired / (wheel_diam_m_ / 2);
-
-  double degrees_per_s_left = (rad_per_s_left * 180) / M_PI;
-  double degrees_per_s_right = (rad_per_s_right * 180) / M_PI;
-
-  int32_t left_speed = degrees_per_s_left * wheel_gear_ratio_;
-  int32_t right_speed = degrees_per_s_right * wheel_gear_ratio_;
-
-    */
-
     ros::Time current_time = ros::Time::now();
     double delta_time = (current_time - last_time_).toSec();
     double dt = (current_time - last_time_).toSec();
