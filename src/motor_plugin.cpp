@@ -14,13 +14,6 @@ MotorPlugin::~MotorPlugin()
 {
 }
 
-int32_t MotorPlugin::calc_speed(const geometry_msgs::Twist& cmd_vel_msg, bool left = false)
-{
-  int32_t speed = 0;
-
-  return speed;
-}
-
 void MotorPlugin::cmd_vel_callback(const geometry_msgs::Twist& cmd_vel_msg)
 {
   OskarPacket packet;

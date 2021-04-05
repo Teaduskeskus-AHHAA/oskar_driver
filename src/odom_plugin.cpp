@@ -29,25 +29,6 @@ OdomPlugin::~OdomPlugin()
 {
 }
 
-int32_t OdomPlugin::calc_speed(const geometry_msgs::Twist& cmd_vel_msg, bool left = false)
-{
-  int divider = left ? -2 : 2;
-  float mps = (cmd_vel_msg.linear.x + ((this->base_width_ / divider) * cmd_vel_msg.angular.z));
-  float radps = mps / 0.084;
-  float dps = radps * 57.29578;
-  int32_t speed = dps * 6;
-  return speed;
-}
-
-float OdomPlugin::calc_speed_inverse(int32_t speed, float theta, bool left = false)
-{
-  // speed = left ? speed * -1 : speed;
-  int divider = left ? -2 : 2;
-  float mps = (((speed / 6) / 57.29578) * 0.084);
-  float vel = mps - ((this->base_width_ * theta) / divider);
-  return vel;
-}
-
 void OdomPlugin::setFrameId(const std::string& frame_id)
 {
   odom_msg_.header.frame_id = frame_id;

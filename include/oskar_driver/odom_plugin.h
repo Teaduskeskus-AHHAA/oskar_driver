@@ -40,8 +40,6 @@ private:
   double wheel_gear_ratio_;
   double wheel_dist_m_;
 
-  int32_t calc_speed(const geometry_msgs::Twist& cmd_vel_msg, bool left);
-  float calc_speed_inverse(int32_t speed, float theta, bool left);
   ros::Time last_time_;
 };
 }  // namespace ahhaa_oskar
