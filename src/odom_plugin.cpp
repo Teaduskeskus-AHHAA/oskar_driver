@@ -17,9 +17,8 @@ OdomPlugin::OdomPlugin(BoardComms* comms, std::string name) : Plugin(comms, name
   reset();
 
   last_time_ = ros::Time::now();
-
-  // Initialize odom publisher
   odom_pub_ = nh_.advertise<nav_msgs::Odometry>("odom", 2);
+
   this->nh_.getParam("phys/wheel_diam_m", wheel_diam_m_);
   this->nh_.getParam("phys/wheel_dist_m", wheel_dist_m_);
   this->nh_.getParam("phys/wheel_gear_ratio", wheel_gear_ratio_);
@@ -68,8 +67,6 @@ void OdomPlugin::reset()
 
 void OdomPlugin::processPacket(OskarPacket packet)
 {
-  // ROS_INFO("Odom has at least a packet w command %x", packet.getCommand());
-
   if (packet.getCommand() == ODOM_COMMAND)
   {
     ros::Time current_time = ros::Time::now();
