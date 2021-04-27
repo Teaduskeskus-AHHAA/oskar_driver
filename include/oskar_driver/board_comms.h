@@ -13,6 +13,9 @@ public:
   BoardComms(std::string port_name, int baudrate);
   ~BoardComms();
   void send(OskarPacket packet);
+
+  bool connected();
+
   std::vector<OskarPacket> readPackets(OskarPacket packet, std::string temp_DBG);
   std::vector<uint8_t> data_read;
 

@@ -22,6 +22,12 @@ OdomPlugin::OdomPlugin(BoardComms* comms, std::string name) : Plugin(comms, name
   this->nh_.getParam("phys/wheel_diam_m", wheel_diam_m_);
   this->nh_.getParam("phys/wheel_dist_m", wheel_dist_m_);
   this->nh_.getParam("phys/wheel_gear_ratio", wheel_gear_ratio_);
+
+  if (odom_pub_.getNumSubscribers() > 0)
+  {
+    publish();
+    last_time_ = ros::Time::now();
+  }
 }
 
 OdomPlugin::~OdomPlugin()
@@ -67,59 +73,73 @@ void OdomPlugin::reset()
 
 void OdomPlugin::processPacket(OskarPacket packet)
 {
-  if (packet.getCommand() == ODOM_COMMAND)
+  if (comms_->connected())
   {
-    ros::Time current_time = ros::Time::now();
-    double delta_time = (current_time - last_time_).toSec();
-    double dt = (current_time - last_time_).toSec();
+    if (packet.getCommand() == ODOM_COMMAND)
+    {
+      ros::Time current_time = ros::Time::now();
+      double delta_time = (current_time - last_time_).toSec();
+      double dt = (current_time - last_time_).toSec();
 
-    int32_t in_motorspeed_left = (int32_t)((int32_t)packet.data[3] << 24) | ((int32_t)packet.data[2] << 16) |
-                                 ((int32_t)packet.data[1] << 8) | (packet.data[0]);
-    int32_t in_motorspeed_right = (int32_t)((int32_t)packet.data[7] << 24) | ((int32_t)packet.data[6] << 16) |
-                                  ((int32_t)packet.data[5] << 8) | (packet.data[4]);
+      int32_t in_motorspeed_left = (int32_t)((int32_t)packet.data[3] << 24) | ((int32_t)packet.data[2] << 16) |
+                                   ((int32_t)packet.data[1] << 8) | (packet.data[0]);
+      int32_t in_motorspeed_right = (int32_t)((int32_t)packet.data[7] << 24) | ((int32_t)packet.data[6] << 16) |
+                                    ((int32_t)packet.data[5] << 8) | (packet.data[4]);
 
-    double degrees_per_s_left = -in_motorspeed_left / wheel_gear_ratio_;
-    double degrees_per_s_right = in_motorspeed_right / wheel_gear_ratio_;
+      //    ROS_INFO_STREAM("L:" << in_motorspeed_left << " R:" << in_motorspeed_right);
 
-    double radians_per_s_left = (M_PI * degrees_per_s_left) / 180;
-    double radians_per_s_right = (M_PI * degrees_per_s_right) / 180;
+      double degrees_per_s_left = -in_motorspeed_left / wheel_gear_ratio_;
+      double degrees_per_s_right = in_motorspeed_right / wheel_gear_ratio_;
 
-    double vel_left = (radians_per_s_left * wheel_diam_m_) / 2;
-    double vel_right = (radians_per_s_right * wheel_diam_m_) / 2;
+      double radians_per_s_left = (M_PI * degrees_per_s_left) / 180;
+      double radians_per_s_right = (M_PI * degrees_per_s_right) / 180;
 
-    double v_robot_x = (vel_right + vel_left) / 2;
-    double v_robot_y = 0;
+      double vel_left = (radians_per_s_left * wheel_diam_m_) / 2;
+      double vel_right = (radians_per_s_right * wheel_diam_m_) / 2;
 
-    double theta = (vel_right - vel_left) / wheel_dist_m_;
-    th += theta * dt;
+      double v_robot_x = (vel_right + vel_left) / 2;
+      double v_robot_y = 0;
 
-    double v_world_x = v_robot_x * cos(th) - v_robot_y * sin(th);
-    double v_world_y = v_robot_x * sin(th) + v_robot_y * cos(th);
+      double theta = (vel_right - vel_left) / wheel_dist_m_;
+      th += theta * dt;
 
-    x += v_world_x * dt;
-    y += v_world_y * dt;
+      double v_world_x = v_robot_x * cos(th) - v_robot_y * sin(th);
+      double v_world_y = v_robot_x * sin(th) + v_robot_y * cos(th);
 
-    geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(th);
+      x += v_world_x * dt;
+      y += v_world_y * dt;
 
-    odom_msg_.header.stamp = current_time;
-    odom_msg_.pose.pose.position.x = x;
-    odom_msg_.pose.pose.position.y = y;
-    odom_msg_.pose.pose.position.z = 0;
-    odom_msg_.pose.pose.orientation = odom_quat;
+      geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(th);
 
-    odom_msg_.twist.twist.linear.x = v_robot_x;
-    odom_msg_.twist.twist.angular.z = theta;
+      odom_msg_.header.stamp = current_time;
+      odom_msg_.pose.pose.position.x = x;
+      odom_msg_.pose.pose.position.y = y;
+      odom_msg_.pose.pose.position.z = 0;
+      odom_msg_.pose.pose.orientation = odom_quat;
 
-    odom_transform_.header.stamp = odom_msg_.header.stamp;
-    odom_transform_.transform.translation.x = x;
-    odom_transform_.transform.translation.y = y;
-    odom_transform_.transform.translation.z = 0;
-    odom_transform_.transform.rotation = odom_quat;
+      odom_msg_.twist.twist.linear.x = v_robot_x;
+      odom_msg_.twist.twist.angular.z = theta;
 
+      odom_transform_.header.stamp = odom_msg_.header.stamp;
+      odom_transform_.transform.translation.x = x;
+      odom_transform_.transform.translation.y = y;
+      odom_transform_.transform.translation.z = 0;
+      odom_transform_.transform.rotation = odom_quat;
+
+      if (odom_pub_.getNumSubscribers() > 0)
+      {
+        publish();
+        last_time_ = current_time;
+      }
+    }
+  }
+  else
+  {
+    reset();
     if (odom_pub_.getNumSubscribers() > 0)
     {
       publish();
-      last_time_ = current_time;
+      last_time_ = ros::Time::now();
     }
   }
 }

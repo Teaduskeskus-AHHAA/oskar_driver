@@ -54,6 +54,11 @@ void BoardComms::reconnect(const ros::TimerEvent& event)
   }
 }
 
+bool BoardComms::connected()
+{
+  return this->serial_.isOpen();
+}
+
 void BoardComms::send(OskarPacket packet)
 {
   if (packet.getEncapsulatedFrame().size() == 0)
