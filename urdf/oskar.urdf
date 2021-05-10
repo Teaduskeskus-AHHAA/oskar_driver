@@ -4,10 +4,10 @@
   <link name="base_link">
     <visual>
       <geometry>
-        <box size="0.430 0.320 0.140"/>
+        <box size="0.600 0.600 0.300"/>
       </geometry>
       <material name="gray">
-        <color rgba=".66 .66 .67 1" />
+        <color rgba=".66 .66 .67 .71" />
       </material>
     </visual>
   </link>
@@ -15,10 +15,10 @@
   <link name="left_wheel">
     <visual>
       <geometry>
-        <cylinder radius="0.075" length="0.05"/>
+        <cylinder radius="0.075" length="0.045"/>
       </geometry>
-      <material name="red">
-        <color rgba="1 0 0 1" />
+        <material name="black">
+        <color rgba="0 0 0 1" />
       </material>
     </visual>
   </link>
@@ -26,7 +26,7 @@
   <link name="right_wheel">
     <visual>
       <geometry>
-        <cylinder radius="0.075" length="0.05"/>
+        <cylinder radius="0.075" length="0.045"/>
       </geometry>
       <material name="black">
         <color rgba="0 0 0 1" />
@@ -40,13 +40,20 @@
         <box size="0.01 0.01 0.01"/> 
       </geometry>
     </visual>
-    
+  </link>
+
+    <link name="body_mountpoint2">
+    <visual>
+      <geometry>
+        <box size="0.01 0.01 0.01"/> 
+      </geometry>
+    </visual>
   </link>
 
   <link name="body">
     <visual>
       <geometry>
-        <cylinder radius="0.5" length="1.5"/>
+        <cylinder radius="0.250" length="0.560"/>
       </geometry> 
       <material name="gray">
         <color rgba=".66 .66 .67 1" />
@@ -81,7 +88,7 @@
   <link name="left_upper_arm">
     <visual>
       <geometry>
-        <cylinder radius="0.1" length=".5"/>
+        <cylinder radius="0.01685" length=".330"/>
       </geometry>
        <material name="gray">
         <color rgba=".66 .66 .67 1" />
@@ -117,7 +124,7 @@
   <link name="right_upper_arm">
     <visual>
       <geometry>
-        <cylinder radius="0.1" length=".5"/>
+        <cylinder radius="0.01685" length=".330"/>
       </geometry>
        <material name="gray">
         <color rgba=".66 .66 .67 1" />
@@ -129,23 +136,29 @@
   <link name="left_forearm">
     <visual>
       <geometry>
-        <cylinder radius="0.1" length="0.5"/>
+        <cylinder radius="0.01685" length=".330"/>
       </geometry>
+ <material name="gray">
+        <color rgba=".66 .66 .67 .71" />
+      </material>
     </visual>
   </link>
 
   <link name="right_forearm">
     <visual>
       <geometry>
-        <cylinder radius="0.1" length="0.5"/>
+        <cylinder radius="0.01685" length=".330"/>
       </geometry>
+ <material name="gray">
+        <color rgba=".66 .66 .67 .71" />
+      </material>
     </visual>
   </link>
 
   <link name="left_elbow">
     <visual>
       <geometry>
-        <box size="0.1 0.1 0.1"/>
+        <box size="0.01 0.01 0.01"/>
       </geometry>
        <material name="gray">
         <color rgba=".66 .66 .67 1" />
@@ -156,7 +169,7 @@
   <link name="right_elbow">
     <visual>
       <geometry>
-        <box size="0.1 0.1 0.1"/>
+        <box size="0.01 0.01 0.01"/>
       </geometry>
        <material name="gray">
         <color rgba=".66 .66 .67 1" />
@@ -164,25 +177,30 @@
     </visual>
   </link>
 
+  <joint name="body_to_mount" type="fixed">
+    <parent link="body_mountpoint2"/>
+    <child link="body"/>
+    <origin xyz="0.0 0.0 0.080" rpy="0.0 0.0 0.0"/>
+  </joint>
 
 
   <joint name="left_wheel_to_base" type="continuous">
     <parent link="base_link"/>
     <child link="right_wheel"/>
-    <origin xyz="0.1075 -0.1851 -0.05" rpy="1.57 0.0 0.0"/>
+    <origin xyz="0.214 -0.240 -0.110" rpy="1.57 0.0 0.0"/>
     <axis xyz="0 0 1"/>
   </joint>
 
   <joint name="right_wheel_to_base" type="continuous">
     <parent link="base_link"/>
     <child link="left_wheel"/>
-    <origin xyz="0.1075 0.1851 -0.05" rpy="1.57 0.0 0.0"/>
+    <origin xyz="0.214 0.240 -0.110" rpy="1.57 0.0 0.0"/>
     <axis xyz="0 0 1"/>
   </joint>
 
   <joint name="kneeling_joint" type="prismatic">
-    <limit lower="0" upper="1" effort="0.0" velocity="0.0"/>
-    <origin xyz="0 0 0.07"/>
+    <limit lower="0.620" upper="0.950" effort="0.0" velocity="0.0"/>
+    <origin xyz="0 0 0.0860"/>
     <axis xyz="0.0 0.0 1.0"/>
     <parent link="base_link"/>
     <child link="body_mountpoint"/>
@@ -190,22 +208,22 @@
 
   <joint name="bowing_joint" type="revolute">
     <parent link="body_mountpoint"/>
-    <child link="body"/>
+    <child link="body_mountpoint2"/>
     <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
     <axis xyz="0 1 0"/>
-    <limit lower="0" upper="1.0" effort="0.0" velocity="0.0"/> 
+    <limit lower="0" upper="0.4" effort="0.0" velocity="0.0"/> 
   </joint>
 
   <joint name="left_shoulder_to_body" type="revolute">
-    <limit lower="-1.0" upper="1.0" effort="0.0" velocity="0.0"/>
-    <origin xyz="0.0 0.6 .65" rpy="0.0 0.0 0.0"/>
+    <limit upper="0" lower="-3.14" effort="0.0" velocity="0.0"/>
+    <origin xyz="0 0.317 0.213" rpy="0.0 0.0 0.0"/>
     <axis xyz="0.0 1 0.0"/>
     <parent link="body"/>
     <child link="left_shoulder"/>
   </joint>
 
   <joint name="left_upper_arm_to_left_shoulder" type="revolute">
-    <limit lower="0.0" upper="1.0" effort="0.0" velocity="0.0"/>
+    <limit lower="0.0" upper="3.14" effort="0.0" velocity="0.0"/>
     <origin xyz="0.0 0.0 0" rpy="0.0 0.0 0.0"/>
     <axis xyz="1.0 0.0 0.0"/>
     <parent link="left_shoulder"/>
@@ -215,20 +233,20 @@
   <joint name="left_upper_arm_to_shoulder_joints" type="fixed">
     <parent link="left_upper_arm_rotational"/>
     <child link="left_upper_arm"/>
-    <origin xyz="0.0 0.0 -0.25" rpy="0.0 0.0 0.0"/>
+    <origin xyz="0.0 0.0 -0.165" rpy="0.0 0.0 0.0"/>
   </joint>
 
 
    <joint name="right_shoulder_to_body" type="revolute">
-    <limit lower="-1.0" upper="1.0" effort="0.0" velocity="0.0"/>
-    <origin xyz="0.0 -0.6 .65" rpy="0.0 0.0 0.0"/>
+    <limit lower="-3.14" upper="0" effort="0.0" velocity="0.0"/>
+    <origin xyz="0 -0.317 0.213" rpy="0.0 0 0.0"/>
     <axis xyz="0.0 1 0.0"/>
     <parent link="body"/>
     <child link="right_shoulder"/>
   </joint>
 
   <joint name="right_upper_arm_to_right_shoulder" type="revolute">
-    <limit lower="0.0" upper="1.0" effort="0.0" velocity="0.0"/>
+    <limit lower="0.0" upper="3.14" effort="0.0" velocity="0.0"/>
     <origin xyz="0.0 0.0 0" rpy="0.0 0.0 0.0"/>
     <axis xyz="-1.0 0.0 0.0"/>
     <parent link="right_shoulder"/>
@@ -238,16 +256,16 @@
   <joint name="right_upper_arm_to_shoulder_joints" type="fixed">
     <parent link="right_upper_arm_rotational"/>
     <child link="right_upper_arm"/>
-    <origin xyz="0.0 0.0 -0.25" rpy="0.0 0.0 0.0"/>
+    <origin xyz="0.0 0.0 -0.165" rpy="0.0 0.0 0.0"/>
   </joint>
 
 
   <joint name="right_elbow_joint" type="revolute">
     <parent link="right_upper_arm"/>
     <child link="right_elbow"/>
-    <origin xyz="0.0 0.0 -0.25" rpy="0.0 0.0 0.0"/>
-    <limit lower="0.0" upper="1.0" effort="0.0" velocity="0.0"/>
-        <axis xyz="0.0 -1.0 0.0"/>
+    <origin xyz="0.0 0.0 -0.165" rpy="0.0 0.0 0.0"/>
+    <limit lower="0.0" upper="2.04" effort="0.0" velocity="0.0"/>
+      <axis xyz="0.0 -1.0 0.0"/>
 
   </joint>
 
@@ -255,9 +273,8 @@
     <parent link="left_upper_arm"/>
     <child link="left_elbow"/>
     <axis xyz="0 -1.0 0.0"/>
-    
-    <origin xyz="0.0 0.0 -0.25" rpy="0.0 0.0 0.0"/>
-    <limit lower="0.0" upper="1.0" effort="0.0" velocity="0.0"/>
+    <origin xyz="0.0 0.0 -0.165 " rpy="0.0 0.0 0.0"/>
+    <limit lower="0.0" upper="2.04" effort="0.0" velocity="0.0"/>
     
   </joint>
 
@@ -265,33 +282,15 @@
   <joint name="left_forearm_to_elbow" type="fixed">
     <parent link="left_elbow"/>
     <child link="left_forearm"/>
-    <origin xyz="0.0 0.0 -0.25" rpy="0.0 0.0 0.0"/>
+    <origin xyz="0.0 0.0 -0.165" rpy="0.0 0.0 0.0"/>
     
   </joint>
 
   <joint name="right_forearm_to_elbow" type="fixed">
     <parent link="right_elbow"/>
     <child link="right_forearm"/>
-    <origin xyz="0.0 0.0 -0.25" rpy="0.0 0.0 0.0"/>
+    <origin xyz="0.0 0.0 -0.165" rpy="0.0 0.0 0.0"/>
     
   </joint>
 
- <!-- <joint name="oskar3_body_to_base" type="prismatic">
-    <parent link="base_link"/>
-    <child link="oskar3_body"/>
-    <origin xyz="0.215 0 0.140"/>
-    <axis xyz="0 0 1"/>     
-    <limit lower="0.140" upper="1.0" effort="0.0" velocity="0.0"/>
-        
-  </joint>
-
-  <joint name="oskar3_body_tilt" type="revolute">
-    <parent link="base_link"/>
-    <child link="oskar3_body"/>
-    <origin xyz="0.215 0 0.540"/>
-    <axis xyz="0 1 0"/>     
-    <limit lower="0.140" upper="1.0" effort="0.0" velocity="0.0"/>
-        
-  </joint>
--->
 </robot>

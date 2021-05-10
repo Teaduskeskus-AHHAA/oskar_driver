@@ -23,6 +23,9 @@ private:
   void setChildFrameId(const std::string& child_frame_id);
   void publish();
 
+  void fake_odom(const ros::TimerEvent& event);
+  ros::Timer timer_;
+
   nav_msgs::Odometry odom_msg_;
   geometry_msgs::TransformStamped odom_transform_;
 
