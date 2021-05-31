@@ -64,7 +64,7 @@
   <link name="left_shoulder">
     <visual>
       <geometry>
-        <box size="0.1 0.1 0.1"/>
+        <box size="0.01 0.01 0.01"/>
       </geometry>
        <material name="gray">
         <color rgba=".66 .66 .67 1" />
@@ -76,7 +76,7 @@
   <link name="left_upper_arm_rotational">
     <visual>
       <geometry>
-        <box size="0.1 0.1 0.1"/>
+        <box size="0.01 0.01 0.01"/>
       </geometry>
        <material name="gray">
         <color rgba=".66 .66 .67 1" />
@@ -100,7 +100,7 @@
   <link name="right_shoulder">
     <visual>
       <geometry>
-        <box size="0.1 0.1 0.1"/>
+        <box size="0.01 0.01 0.01"/>
       </geometry>
        <material name="gray">
         <color rgba=".66 .66 .67 1" />
@@ -112,7 +112,7 @@
   <link name="right_upper_arm_rotational">
     <visual>
       <geometry>
-        <box size="0.1 0.1 0.1"/>
+        <box size="0.01 0.01 0.01"/>
       </geometry>
        <material name="gray">
         <color rgba=".66 .66 .67 1" />
@@ -176,6 +176,45 @@
       </material>
     </visual>
   </link>
+
+
+  <link name="right_gripper">
+     <visual>
+      <geometry>
+        <box size="0.1 0.1 0.1"/>
+      </geometry>
+       <material name="gray">
+        <color rgba=".66 .66 .67 1" />
+      </material>
+    </visual>
+  </link>
+
+  <joint name="right_ripper_to_right_forearm" type="fixed">
+    <parent link="right_forearm"/>
+    <child link="right_gripper"/>
+    <origin xyz="0.0 0.0 -0.165" rpy="0.0 0.0 0.0"/>
+    
+  </joint>
+
+
+  <link name="left_gripper">
+     <visual>
+      <geometry>
+        <box size="0.1 0.1 0.1"/>
+      </geometry>
+       <material name="gray">
+        <color rgba=".66 .66 .67 1" />
+      </material>
+    </visual>
+  </link>
+
+  <joint name="left_ripper_to_right_forearm" type="fixed">
+    <parent link="left_forearm"/>
+    <child link="left_gripper"/>
+    <origin xyz="0.0 0.0 -0.165" rpy="0.0 0.0 0.0"/>
+    
+  </joint>
+
 
   <joint name="body_to_mount" type="fixed">
     <parent link="body_mountpoint2"/>

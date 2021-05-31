@@ -3,7 +3,7 @@
 
 using namespace ahhaa_oskar;
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
   // Register a ROS node
   ros::init(argc, argv, "ahhaa_oskar_driver_node");

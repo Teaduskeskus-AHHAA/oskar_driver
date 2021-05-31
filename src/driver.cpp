@@ -2,6 +2,7 @@
 #include <oskar_driver/driver.h>
 #include <oskar_driver/motor_plugin.h>
 #include <oskar_driver/odom_plugin.h>
+#include <oskar_driver/moveit_plugin.h>
 
 namespace ahhaa_oskar
 {
@@ -16,6 +17,7 @@ Driver::Driver()
 
   this->plugins_.emplace_back(std::make_shared<MotorPlugin>(this->bc_, "MotorPlugin"));
   this->plugins_.emplace_back(std::make_shared<OdomPlugin>(this->bc_, "OdomPlugin"));
+  this->plugins_.emplace_back(std::make_shared<MoveitPlugin>(this->bc_, "MoveitPlugin"));
 }
 
 Driver::~Driver()

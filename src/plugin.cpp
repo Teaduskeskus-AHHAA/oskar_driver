@@ -2,7 +2,7 @@
 
 namespace ahhaa_oskar
 {
-Plugin::Plugin(BoardComms *comms, std::string name) : name_(name), comms_(comms)
+Plugin::Plugin(BoardComms* comms, std::string name) : name_(name), comms_(comms)
 {
   ROS_INFO("Created plugin %s\n", name.c_str());
 }

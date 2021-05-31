@@ -9,6 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
   serial
   geometry_msgs
   nav_msgs
+  moveit_msgs
   tf
 )
 
@@ -18,6 +19,7 @@ catkin_package(
     geometry_msgs
     serial
     nav_msgs
+    moveit_msgs
     tf
 )
 

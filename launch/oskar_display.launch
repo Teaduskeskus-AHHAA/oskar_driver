@@ -17,6 +17,14 @@
   <!--param name="use_gui" value="$(arg gui)"/-->
   <node name="" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" />
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
-  
+
+      <include file="$(find realsense2_camera)/launch/includes/nodelet.launch.xml">
+            <arg name="enable_pointcloud"        value="true"/>
+                        <arg name="tf_prefix"        value="camera"/>
+
+      </include> 
+<node pkg="tf" type="static_transform_publisher" name="front_camera" args="0.3 0 0.15 0 0 0 1 base_link camera_link 100" />
+  <node pkg="tf" type="static_transform_publisher" name="front_cameram" args="0.3 0 0.15 0 0 0 1 base_link mynteye_link 100" />
+
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" />
 </launch>
