@@ -1,7 +1,29 @@
 <?xml version="1.0" ?>
 <launch>
+  <arg name="pipeline" default="ompl" />
+  <param name="robot_description" textfile="$(find oskar_driver)/urdf/oskar.urdf"/>
   <node pkg="joy" name="joy" type="joy_node" output="screen"/>
   <node pkg="teleop_twist_joy" name="teleop_node" type="teleop_node" output="screen" />
   <rosparam file="$(find oskar_driver)/config/oskar_params.yaml" subst_value="true" command="load" />
   <node pkg="oskar_driver" name="oskar_driver_node" type="ahhaa_oskar_driver_node" output="screen" />
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+  <include file="$(find oskar_moveit_config)/launch/move_group.launch">
+    <arg name="publish_monitored_planning_scene" value="true" />
+    <arg name="pipeline" value="$(arg pipeline)"/>
+        <arg name="load_robot_description" value="true" />
+
+  </include>
+  <node name="" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" />
+
+  <include file="$(find oskar_driver)/launch/oskar_moveit_controller_manager.launch">
+            
+
+  </include> 
+
+  <include file="$(find oskar_moveit_config)/launch/planning_context.launch" >
+    <arg name="load_robot_description" value="true" />
+
+  </include>
+
+
 </launch>
