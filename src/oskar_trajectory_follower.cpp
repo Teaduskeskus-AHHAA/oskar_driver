@@ -17,7 +17,8 @@ OskarTrajectoryFollower::~OskarTrajectoryFollower()
 
 void OskarTrajectoryFollower::goalCB()
 {
-  ROS_INFO_STREAM("GOAL CB");
+  trajectory_ = as_.acceptNewGoal()->trajectory;
+  ROS_INFO_STREAM("Accepted Goal");
 }
 
 void OskarTrajectoryFollower::preemptCB()

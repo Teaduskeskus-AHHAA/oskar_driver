@@ -4,6 +4,7 @@
 #include <ros/ros.h>
 #include <actionlib/server/simple_action_server.h>
 #include <control_msgs/FollowJointTrajectoryAction.h>
+#include <control_msgs/FollowJointTrajectoryGoal.h>
 #include <trajectory_msgs/JointTrajectory.h>
 
 namespace ahhaa_oskar
@@ -20,6 +21,7 @@ private:
   ros::NodeHandle nh_;
   actionlib::SimpleActionServer<control_msgs::FollowJointTrajectoryAction> as_;
   std::string action_name_;
+  trajectory_msgs::JointTrajectory trajectory_;
 };
 }  // namespace ahhaa_oskar
 
