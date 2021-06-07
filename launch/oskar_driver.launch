@@ -1,5 +1,6 @@
 <?xml version="1.0" ?>
 <launch>
+
   <arg name="pipeline" default="ompl" />
   <param name="robot_description" textfile="$(find oskar_driver)/urdf/oskar.urdf"/>
   <node pkg="joy" name="joy" type="joy_node" output="screen"/>
@@ -15,9 +16,7 @@
   </include>
   <node name="" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" />
 
-  <include file="$(find oskar_driver)/launch/oskar_moveit_controller_manager.launch">
-            
-
+  <include file="$(find oskar_moveit_config)/launch/oskar_moveit_controller_manager.launch.xml">
   </include> 
 
   <include file="$(find oskar_moveit_config)/launch/planning_context.launch" >
